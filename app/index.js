@@ -11,42 +11,36 @@ export default function App() {
     const [pressed, setPressed] = useState([]);
     const [locked, setLocked] = useState(true);
 
-    const [buttonColor, setBtnColor] = useState(styles.locked);
+    [buttonBoxes, setButtonBoxes] = useState([true, false])
 
+     shuffle = () => {
+        let newBoxes = [false, false];
+        newBoxes[Math.floor(Math.random() * 2)] = true;
+        setButtonBoxes(newBoxes);
+    }
+
+     const [isGood, SetIsGood] = useState(false);
+
+    const isItGood = (numb) => {
+        if (buttonBoxes[numb] != true) {
+            SetIsGood(true);
+        }
+        else {
+            Alert.alert("Bomb");
+            SetIsGood(false);
+        }
+    }
+
+    
     const [score, setScore] = useState(0);
-
-    const code = [2]; // this is “secret”
 
     const clearLock = () => {
         setPressed([]);
         setLocked(true);
-        setBtnColor(styles.locked);
+      
     }
 
-    const bombShuffle = (id) => {
-        let newBoxes = [false, false, false,false,false];
-        newBoxes[Math.floor(Math.random() * 5)] = true;
-        setBoxes(newBoxes);
-    }
-
-    const keyPress = (btn) => {
-        setPressed(prev => [...prev, btn]);
-    }
-
-    //check after each key press
-    useEffect(() => {
-        if (pressed.length === code.length) {
-            if (code.every((elem, idx) => elem === pressed[idx])) {
-                setLocked(false);
-                setBtnColor(styles.unlocked);
-            }
-            else {
-                clearLock();
-                // this would be a good place to alert the user
-                Alert.alert("Cleared!");
-            }
-        }
-    }, [pressed])
+ 
 
 
     return (
@@ -55,8 +49,9 @@ export default function App() {
             <View style={styles.buttonView}>
             <View style={styles.buttonRow}>
                     <Pressable
-                        style={[styles.buttonBox, buttonColor,]} onPress={() => bombShuffle()} />
-                   
+                        style={[styles.buttonBox]} onPress={() => isItGood(0)} backgroundColor={isGood[0] ? "green" : "red"} />
+                    <Pressable
+                        style={[styles.buttonBox]} onPress={() => isItGood(1)} backgroundColor={isGood[1] ? "green" : "red"} />
                 </View>
             </View>
             <View style={styles.buttonView}>
@@ -88,11 +83,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin:0,
         padding:0,
-        backgroundColor: 'black',
+
         borderWidth: 2
     },
-    locked: { backgroundColor: 'grey', },
-    unlocked: { backgroundColor: 'green', },
+ 
     score: {
         marginBottom: 15,
         justifyContent: 'center',
