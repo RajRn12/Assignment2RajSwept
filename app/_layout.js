@@ -9,7 +9,7 @@ export default function Layout() {
 	return (
 		<Stack screenOptions={{
 			headerTitle: "Mine Swept",
-			headerStyle: { backgroundColor: "green" },
+			headerStyle: { backgroundColor: "gray" },
 			headerTitleStyle: {
 				fontWeight: "bold",
 				color: "white"

@@ -3,62 +3,79 @@
  * Author - Raj Rai
  */
 import { Link } from 'expo-router';
-import { StyleSheet, Text, View, Pressable, Button, Alert } from 'react-native';
+import { StyleSheet, Image, Text, View, Pressable, Button, Alert, Switch} from 'react-native';
 import { useState, useEffect } from 'react';
+import tile from '../images/tile.jpg';
+import point100 from '../images/100.jpg';
+import point200 from '../images/200.jpg';
+import point400 from '../images/400.jpg';
+import point500 from '../images/500.jpg';
 
-
+import  bomb  from '../images/bomb.jpg';
 export default function App() {
-    const [pressed, setPressed] = useState([]);
-    const [locked, setLocked] = useState(true);
 
-    [buttonBoxes, setButtonBoxes] = useState([true, false])
 
-     shuffle = () => {
-        let newBoxes = [false, false];
-        newBoxes[Math.floor(Math.random() * 2)] = true;
-        setButtonBoxes(newBoxes);
-    }
-
-     const [isGood, SetIsGood] = useState(false);
-
-    const isItGood = (numb) => {
-        if (buttonBoxes[numb] != true) {
-            SetIsGood(true);
-        }
-        else {
-            Alert.alert("Bomb");
-            SetIsGood(false);
-        }
-    }
-
-    
     const [score, setScore] = useState(0);
+    const [show, setShow] = useState(true);
+    const [start, setStart] = useState(false);
 
-    const clearLock = () => {
-        setPressed([]);
-        setLocked(true);
-      
+
+    const selectBomb = () => {
+    const randomIndex = Math.floor(Math.random() * tiles.length);
+    const newTiles = [...tiles];
+    newTiles[randomIndex] = true;
+    setTiles(newTiles);
     }
 
- 
+    const startIt = () => {
+        setShow(!show);
+        setStart(true);    
+    }
 
+    function resetGame() {
+        setScore(0);
+
+        setTiles(new Array(3).fill(false));
+    }
+    function hitBomb(index) {
+        const newTiles = [...tiles];
+        newTiles[index] = false;
+        setTiles(newTiles);
+       
+            Alert.alert('Game Over', 'You lost all your lives', [{ text: 'OK', onPress: () => resetGame() }]);
+        
+    }
 
     return (
         <View style={styles.container}>
-            <View style={styles.score}><Text style={{ fontSize: 20, fontWeight: 'bold' }}>Score: {score}</Text></View>
-            <View style={styles.buttonView}>
-            <View style={styles.buttonRow}>
-                    <Pressable
-                        style={[styles.buttonBox]} onPress={() => isItGood(0)} backgroundColor={isGood[0] ? "green" : "red"} />
-                    <Pressable
-                        style={[styles.buttonBox]} onPress={() => isItGood(1)} backgroundColor={isGood[1] ? "green" : "red"} />
-                </View>
-            </View>
-            <View style={styles.buttonView}>
-                <Button
-                    onPress={clearLock}
-                    title="Start" />
-            </View>
+            {/* Instruction */ }
+            {
+                show ? null :
+                    <Text style={styles.instruction}>
+                        Instruction: Click on Any Tile. If it is not a bomb, you score some points :)
+                        You can quit early to keep your scores but you won't be admired :/
+                        There will be some hidden bombs, be careful. You must choose all the bomb-free tiles to win the match:)</Text>
+
+            }
+
+            {/* Score */}
+            {
+                show ? <Text style={styles.scoreCount}>Score: </Text> : null
+            }
+
+            {/* Actual Game */}
+            {
+                show ? <User /> : null
+            }
+            <View>
+                {
+                  show? null: <Button title="Start" style={styles.item} onPress={() => startIt()} />
+                }
+                {
+                    show ? <Button title="I am Done" style={styles.item} onPress={() => startIt()} /> : null
+                }
+         </View>
+            
         </View>
     );
 
@@ -71,33 +88,57 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    buttonRow: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        margin: 0,
-    },
-    buttonBox: {
-        height: 70,
-        width: 70,
-        borderRadius: 5,
-        margin:0,
-        padding:0,
+    item: {
+        marginTop: 20,
+        padding: 20,
+        backgroundColor: '',
+        fontSize: 24,
 
-        borderWidth: 2
     },
- 
-    score: {
-        marginBottom: 15,
+    scoreCount: {
+        fontSize: 30,
+        color: 'blue',
+    },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'center',
     },
-    buttonView: {
-        marginTop: 30,
-        marginBottom:230,
-        height: 40,
-        width: 100,
+    image: {
+        width: 120,
+        height: 120,
+        margin: 20,
     },
-    selectedBomb: {
-        backgroundColor: 'red'
+    instruction: {
+        fontSize: 18,
+        fontWeight: 'normal',
+        marginBottom: 120,
+        textAlign: 'center',
     }
 });
+
+const User = () => {
+    const [tiles, setTiles] = useState([
+        { id: 0, image:tile,good: true },
+        { id: 1, image:tile, good: true }
+    ]);
+
+    const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
+
+    const givePoints = () => {
+        setTiles(tiles[0].image);
+    }
+    const isSelected = () => {
+        Alert.alert("Bomb!");
+    }
+
+    return (
+        <View style={styles.container}>
+            <View>
+                <Pressable onPress={() => givePoints()}><Image source={tiles[0].image} style={styles.image} /></Pressable>
+                    </View>
+                
+          
+        </View>
+    )
+}
