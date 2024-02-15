@@ -10,6 +10,8 @@ import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
 import point400 from '../images/400.jpg';
 import point500 from '../images/500.jpg';
+import { Link } from 'expo-router'
+
 
 import  bomb  from '../images/bomb.jpg';
 export default function App() {
@@ -74,7 +76,29 @@ export default function App() {
                 {
                     show ? <Button title="I am Done" style={styles.item} onPress={() => startIt()} /> : null
                 }
-         </View>
+            </View>
+           
+        
+                <Link
+                    style={Styles.makeButton}
+                    href={{
+                        pathname: "/page2",
+                        params: {
+                            name,
+                            noun,
+                            event,
+                            date_Label,
+                            date_Month,
+                            date_Day,
+                            date_Year
+                        }
+                    }} asChild
+                >
+                    {/* takes to second page upon pressing 'Make Pass' button */}
+                    <Pressable>
+                        <Text style={Styles.makeButtonText}>Make Pass {'\n'}</Text>
+                    </Pressable>
+                </Link>
             
         </View>
     );
