@@ -138,6 +138,18 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
         marginBottom: 120,
         textAlign: 'center',
+    },
+    button: {
+        backgroundColor: 'lightgreen',
+        borderBlockColor: 'black',
+        borderStyle: 'solid',
+        borderWidth: 2,
+        borderRadius: 7,
+        margin: 10,
+        padding: 10,
+    },
+    buttonText: {
+        fontSize: 24,
     }
 });
 
