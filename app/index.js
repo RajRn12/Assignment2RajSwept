@@ -10,8 +10,6 @@ import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
 import point400 from '../images/400.jpg';
 import point500 from '../images/500.jpg';
-import { Link } from 'expo-router'
-
 
 import  bomb  from '../images/bomb.jpg';
 export default function App() {
@@ -28,6 +26,7 @@ export default function App() {
     newTiles[randomIndex] = true;
     setTiles(newTiles);
     }
+
 
     const startIt = () => {
         setShow(!show);
@@ -79,26 +78,7 @@ export default function App() {
             </View>
            
         
-                <Link
-                    style={Styles.makeButton}
-                    href={{
-                        pathname: "/page2",
-                        params: {
-                            name,
-                            noun,
-                            event,
-                            date_Label,
-                            date_Month,
-                            date_Day,
-                            date_Year
-                        }
-                    }} asChild
-                >
-                    {/* takes to second page upon pressing 'Make Pass' button */}
-                    <Pressable>
-                        <Text style={Styles.makeButtonText}>Make Pass {'\n'}</Text>
-                    </Pressable>
-                </Link>
+   
             
         </View>
     );
@@ -155,15 +135,18 @@ const styles = StyleSheet.create({
 
 const User = () => {
     const [tiles, setTiles] = useState([
-        { id: 0, image:tile,good: true },
-        { id: 1, image:tile, good: true }
+        { image:tile,good: true },
+        { image:tile, good: true } 
     ]);
 
     const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
 
-    const givePoints = () => {
-        setTiles(tiles[0].image);
+    const givePoints = (pos) => {
+        let temp = tiles;
+        temp[pos].image = point400;
+        setTiles({ ...temp });
     }
+
     const isSelected = () => {
         Alert.alert("Bomb!");
     }
@@ -171,7 +154,8 @@ const User = () => {
     return (
         <View style={styles.container}>
             <View>
-                <Pressable onPress={() => givePoints()}><Image source={tiles[0].image} style={styles.image} /></Pressable>
+                <Pressable onPress={() => givePoints(0)}><Image source={tiles[0].image} style={styles.image} /></Pressable>W
+                <Pressable onPress={() => givePoints(1)}><Image source={tiles[1].image} style={styles.image} /></Pressable>
                     </View>
                 
           
