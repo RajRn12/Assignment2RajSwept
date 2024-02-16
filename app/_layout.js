@@ -27,6 +27,21 @@ export default function Layout() {
 			<Stack.Screen
 				name="page2"
 				options={{
+					headerTitle: "The Game",
+					headerShown: true,
+					headerTitleStyle: {
+						color: "white",
+						fontWeight: "bold"
+					},
+					headerTitleAlign: "center",
+					headerTintColor: "yellow",
+
+				}}
+			/>
+
+			<Stack.Screen
+				name="page3"
+				options={{
 					headerTitle: "Result",
 					headerShown: true,
 					headerTitleStyle: {
