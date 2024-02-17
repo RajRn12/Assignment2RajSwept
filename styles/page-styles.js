@@ -6,27 +6,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         
     },
-    scoreCount: {
-        fontSize: 30,
-        color: 'blue',
-
-    },
     grid: {
-        marginTop: 60,
+        marginTop: 13,
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
     },
+
+    clockImage: {
+        width: 23,
+        height: 23,
+    },
     image: {
         width: 70,
         height: 70,
-        margin: -0,
     },
+
     instruction: {
         fontSize: 18,
         fontWeight: 'normal',
         textAlign: 'center',
     },
+
     button: {
         backgroundColor: 'lightgreen',
         borderBlockColor: 'black',
@@ -40,8 +41,15 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign:'center',
         fontSize: 20,
+    },
 
-    }
+    input: {
+        width: 211,
+        height: 40,
+        borderWidth: 1,
+        borderRadius: 10,
+        textAlign: 'center'
+    },
 });
 
 export default styles;
