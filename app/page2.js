@@ -1,10 +1,10 @@
 /**
- * Credit - Stepehen Graham
+ * Credit - Stepehen Graham, Claire Fleckney
  * Author - Raj Rai
  */
 import { Link, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Image, Text, View, Pressable, Button, Alert, TextInput } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import tile from '../images/tile.jpg';
 import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
@@ -124,50 +124,56 @@ const EasyDifficulty = ({name}) => {
 
     {/* Timer */}
     const [count, setCount] = useState(0);
+    const timer = useRef(null);
     useEffect(() => {
+
         if (name != '') {
             setP_Name(name);
         }
         else {
             setP_Name("Unknown");
         }
-
-        if (hasBegun == true && count != 0 && stop != true) {
-            const interval = setInterval(() => {
+       
+        if (hasBegun == true && count != 0 && win != true) {
+            timer.current = setInterval(() => {
                 setCount(c => c + 1);
             }, 1000);
 
-            return () => clearInterval(interval)
+            isWin();
+            return () => clearInterval(timer.current)
         }
     }, [count]);
 
+    const stopTimer = () => {
+        clearInterval(timer.current);
+    };
 
     const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
 
-    {/* User cannot select the same tile again or cannot select any tile unless game has begun or if count is 0 */ }
+    {/* User cannot select the same tile again or cannot select any tile unless game has begun, not bailed out, bomb not found */ }
     const disableSelected = (pos) => {
-        if (hasBegun == false || tiles[pos].selected == true || count == 0) {
+        if (hasBegun == false || tiles[pos].selected == true || stop == true || bombFound == true) {
             return true;
         }
     }
 
-    {/* Begin the game - shuffle bomb(s) once and start timer */ }
+    {/* Begin the game - shuffle bomb(s) once and set count to 1 for starting time with useEffect */ }
     const begin = () => {
-        shuffleBomb();
+        
         setHasBegun(true);
         setCount(1);
     }
 
-    {/* Change selected tile's image to random points tile's image */ }
+    {/* Change selected tile's image to random points tile's image or bomb if chosen during shuffle */ }
     function givePoints(pos) {
         let pointX = Math.floor(Math.random() * 4);
-        if (tiles[pos].selected == true && tiles[pos].bomb == false && stop != true) {
+        if (tiles[pos].selected == true && tiles[pos].bomb == false) {
             let temp = tiles;
             temp[pos].image = pointTile[pointX];
             setTiles({ ...temp });
             addScore(pos);
         }
-        if (tiles[pos].selected == true && tiles[pos].bomb == true && stop != true) {
+        if (tiles[pos].selected == true && tiles[pos].bomb == true) {
             let temp = tiles;
             temp[pos].image = bomb;
             setTiles({ ...temp });
@@ -177,7 +183,7 @@ const EasyDifficulty = ({name}) => {
         }
     }
 
-    {/* Increase Score based on points tile's image given to selected tile */ }
+    {/* Increase Score based on points tile's image given to selected tile - alert, reset score and time once bomb's found */ }
     function addScore(pos) {
         if (tiles[pos].image == point100) {
             setScore(score + 100);
@@ -196,6 +202,7 @@ const EasyDifficulty = ({name}) => {
             Alert.alert("Bomb Found: Game Over!!!", "Shame, shame. You couldn't beat the game on easy mode and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with your dolls!");
             setScore(0);
             setCount(0);
+            stopTimer();
         }
     }
 
@@ -218,16 +225,40 @@ const EasyDifficulty = ({name}) => {
             setStop(true);
             Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it is You!")
             setBailout(true);
+            stopTimer();
+    }
+
+    let i = 0;
+    const [win, setWin] = useState(false);
+    const isWin = () => {
+        while (i < 30) { 
+            if (tiles[i].selected == true && tiles[i].image != bomb) {
+                setWin(true);
+                i++;
+            } else {
+                setWin(false);
+                i++;
+            }
+        }
+
     }
 
     return (
         <View style={styles.container}>
-            <View style={{marginLeft: 8,marginTop: 2, padding:0, flexDirection: 'column'}}>
+            {/* Score, timer, guide button */}
+            <View style={{ marginLeft: 24, marginTop: 2, padding: 0, flexDirection: 'column' }}>
                 <Text style={{marginRight: 20, marginTop: 8, color: 'green'} }>Score: {score}</Text>
                 <Text style={{color: 'red' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
                 <Pressable onPress={() => showGuide()}><Image source={guide} style={{ width: 20, height: 20, marginLeft: 2, marginTop: 9 }} /></Pressable>
             </View>
 
+            {/* Player's name, difficulty */}
+            <View style={{ marginLeft: 24, padding: 0, flexDirection: 'row' }}>
+                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
+                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: 'green' }}>Easy</Text></Text>
+            </View>
+
+            {/* Tile grid in form of images  */}
             <View style={styles.grid}>
                 <Pressable disabled={disableSelected(0) ? true : false} onPress={() => isSelected(0)}><Image source={tiles[0].image} style={styles.image} /></Pressable>
                 <Pressable disabled={disableSelected(1) ? true : false} onPress={() => isSelected(1)}><Image source={tiles[1].image} style={styles.image} /></Pressable>
@@ -270,25 +301,25 @@ const EasyDifficulty = ({name}) => {
                     hasBegun ? null : <View style={{ marginTop: 30, width: 150 }}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
                 }
 
-                {/* Show Player Name */}
+                {/* Show bailout button, disable it once bomb's found  */}
                 {
                     hasBegun ?
-                        <View style={{ marginTop: 12}}>
-                            <Text style={{ fontSize: 18 }}>Player Name: {p_Name}</Text>
-                            <Button disabled={bombFound? true: false} title="I am Done" style={styles.item} onPress={() => bailOut()} />
-                        </View> 
+                        <View style={{ marginTop: 15, marginLeft:1, width: 200 }}>
+                            <Button disabled={bombFound ? true : false} title="I am Done" style={styles.item} onPress={() => bailOut()} />
+                        </View>
                         : null
                 }
 
-
+                {/* Show link button to next page once bailout button's been pressed */}
                 {
                     bailout ?
-                        <View style={{ alignItems: 'center', marginTop: 15, padding: 0, }}>
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
                             <Link
                                 style={styles.button}
                                 href={{
                                     pathname: "/page3",
                                     params: {
+                                        p_Name,
                                         score,
                                         count
                                     }
@@ -296,22 +327,23 @@ const EasyDifficulty = ({name}) => {
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
                                 <Pressable style={styles.button}>
-                                    <Text style={styles.buttonText}>Cick To Game Page {'\n'}</Text>
+                                    <Text style={styles.buttonText}>Summary</Text>
                                 </Pressable>
                             </Link>
                         </View>
                         : null
                 }
 
-
+                {/* Show link button to next page once bomb's found */}
                 {
                     bombFound ?
-                        <View style={{ alignItems: 'center', marginTop: 15, padding: 0, }}>
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
                             <Link
                                 style={styles.button}
                                 href={{
                                     pathname: "/page3",
                                     params: {
+                                        p_Name,
                                         score,
                                         count
                                     }
@@ -319,12 +351,13 @@ const EasyDifficulty = ({name}) => {
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
                                 <Pressable style={styles.button}>
-                                    <Text style={styles.buttonText}>Cick To Game Page {'\n'}</Text>
+                                    <Text style={styles.buttonText}>Summary</Text>
                                 </Pressable>
                             </Link>
                         </View>
                         : null
                 }
+           
 
             </View>
 

@@ -4,6 +4,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        alignItems: ''
         
     },
     grid: {
@@ -18,14 +19,15 @@ const styles = StyleSheet.create({
         height: 23,
     },
     image: {
-        width: 70,
-        height: 70,
+        width: 68,
+        height: 67,
     },
 
     instruction: {
         fontSize: 18,
         fontWeight: 'normal',
         textAlign: 'center',
+
     },
 
     button: {
@@ -34,9 +36,9 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderWidth: 2,
         borderRadius: 7,
-        padding: 5,
-        width: 200,
-        height: 50,
+        padding: 2,
+        width: 100,
+        height: 40,
     },
     buttonText: {
         textAlign:'center',

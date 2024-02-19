@@ -21,12 +21,6 @@ export default function Page() {
         }
     }
 
-    removeInstruction = (proceed) => {
-        if (proceed == true) {
-
-        }
-    }
-
     const [playerName, onChangePlayerName] = useState("");
 
     return (
@@ -100,8 +94,8 @@ export default function Page() {
 
                 {/* Back To Instruction Button */}
                 {
-                    proceed ? 
-                        <View style={{ marginTop: 25, marginLeft: 78, padding: 0, width: 200 }}>
+                    proceed ?
+                        <View style={{ marginTop: 25, width: 200, marginLeft:80 }}>
                             <Button title="Back To Instruction" color='orange' onPress={() => setProceed(false)} />
                         </View>
                         : null
@@ -123,7 +117,7 @@ export default function Page() {
                 >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
                                 <Pressable style={styles.button}>
-                                <Text style={styles.buttonText}>Cick To Game Page {'\n'}</Text>
+                                <Text style={styles.buttonText}>Game{'\n'}</Text>
                     </Pressable>
                         </Link>
                 </View>
