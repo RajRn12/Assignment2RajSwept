@@ -2,8 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\app",
+    "\\assets",
+    "\\assets\\sfx",
     "\\images",
     "\\styles"
   ],
+  "SelectedNode": "\\styles",
   "PreviewInSolutionExplorer": false
 }

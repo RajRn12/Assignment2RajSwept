@@ -1,5 +1,5 @@
 /**
- * Credit - Stepehen Graham, Claire Fleckney
+ * Credit - Stepehen Graham, Claire Fleckney, Stack Overflow
  * Author - Raj Rai
  */
 import { Link, useLocalSearchParams } from 'expo-router';
@@ -13,93 +13,66 @@ import point500 from '../images/500.jpg';
 import clock from '../images/clock.jpg';
 import guide from '../images/instruction.jpg';
 import styles from '../styles/page-styles';
-import bomb from '../images/bomb.jpg';
+import mine from '../images/mine.jpg';
 
 export default function App() {
 
     const params = useLocalSearchParams();
     const {gameDifficulty, playerName} = params;
 
-    const [easy, setEasy] = useState(false);
-    const [medium, setMedium] = useState(false);
-    const [hard, setHard] = useState(false);
-
-    {/* Runs once */}
-    useEffect(() => {
-        if (gameDifficulty == 'Easy') {
-            setEasy(true);
-            setMedium(false);
-            setHard(false);
-         }
-         else if (gameDifficulty == 'Medium') {
-            setMedium(true);
-            setEasy(false);
-            setHard(false);
-            }
-        else {
-            setHard(true);
-            setEasy(false);
-            setMedium(false);
-            
-        }
-    }, []);
-    
-
     return (
         <View style={styles.container}>
-            {
-                easy ? <EasyDifficulty name={playerName} /> : null
-            }
-            {/*{*/}
-            {/*    medium ? <MediumDifficulty /> : null*/}
-            {/*}*/}
-            {/*{*/}
-            {/*    hard ? <HardDifficulty /> : null*/}
-            {/*}*/}
+            <MainGame name={playerName} difficulty={gameDifficulty} />
         </View>
     );
 
 }
 
 {/* Easy Difficulty */ }
-const EasyDifficulty = ({name}) => {
+const MainGame = ({ name , difficulty }) => {
     const [tiles, setTiles] = useState([
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
 
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
 
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
 
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
-        { image: tile, selected: false, bomb: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
+        { image: tile, selected: false, mine: false },
     ]);
 
     const [p_Name, setP_Name] = useState('');
+
+    const [g_Difficulty, setG_Difficulty] = useState('');
+
+    const [moreTiles, setMoreTiles] = useState(false);
+
+    const [moreMines, setMoreMines] = useState(false);
 
     const [random, setRandom] = useState(null);
 
@@ -109,38 +82,41 @@ const EasyDifficulty = ({name}) => {
 
     const [stop, setStop] = useState(false);
 
-    const [bombFound, setBombFound] = useState(false);
+    const [mineFound, setmineFound] = useState(false);
 
-    {/* Shuffle Bomb */ }
-    shuffleBomb = () => {
-        let x = Math.floor(Math.random() * 30);
-        if (random != x) {
-            setRandom(x);
-            let temp = tiles;
-            temp[x].bomb = true;
-            setTiles({ ...temp });
-        }
-    }
+    const [num_GoodTile, setNum_GoodTile] = useState(0);
 
-    {/* Timer */}
+    const [win, setWin] = useState(false);
+
+    {/* Timer */ }
+    {/* Set Player Name as Unkown if name's not entered */ }
     const [count, setCount] = useState(0);
     const timer = useRef(null);
     useEffect(() => {
+        // Difficulty
+        if (difficulty == 'MORE TILES') {
+            setMoreTiles(true);
+            setG_Difficulty('MORE TILES');
+        }
+        else {
+            setMoreMines(true);
+            setG_Difficulty('MORE MINES')
+        }
 
+        // Name
         if (name != '') {
             setP_Name(name);
         }
         else {
             setP_Name("Unknown");
         }
-       
         if (hasBegun == true && count != 0 && win != true) {
             timer.current = setInterval(() => {
                 setCount(c => c + 1);
             }, 1000);
-
             isWin();
             return () => clearInterval(timer.current)
+
         }
     }, [count]);
 
@@ -148,42 +124,100 @@ const EasyDifficulty = ({name}) => {
         clearInterval(timer.current);
     };
 
-    const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
-
-    {/* User cannot select the same tile again or cannot select any tile unless game has begun, not bailed out, bomb not found */ }
-    const disableSelected = (pos) => {
-        if (hasBegun == false || tiles[pos].selected == true || stop == true || bombFound == true) {
-            return true;
+    { /* check Win */ }
+    { /* Time stops a second later so the substraction is needed */ }
+    const isWin = () => {
+        if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
+            Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
+            setWin(true);
+            stopTimer();
+            setCount(c => c - 1);
         }
     }
 
-    {/* Begin the game - shuffle bomb(s) once and set count to 1 for starting time with useEffect */ }
+    {/* Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect */ }
+    {/* Record # of good tiles for determining the win */}
     const begin = () => {
-        
+        if (moreMines != true) {
+            shufflemine();
+            shufflemine();
+            shufflemine();
+        }
+        else {
+            shufflemine();
+            shufflemine();
+            shufflemine();
+            shufflemine();
+        }
+        checkGoodTile();
         setHasBegun(true);
         setCount(1);
     }
 
-    {/* Change selected tile's image to random points tile's image or bomb if chosen during shuffle */ }
-    function givePoints(pos) {
+    {/* Shuffle mine - One mine For Easy Difficulty */ }
+    const shufflemine = () => {
+        let x = 0;
+        if (moreMines != true) {
+             x = Math.floor(Math.random() * 30);
+        }
+        else {
+             x = Math.floor(Math.random() * 25);
+        }
+        if (random != x) {
+            setRandom(x);
+            let temp = tiles;
+            temp[x].mine = true;
+            setTiles({ ...temp });
+        }
+    }
+
+    {/* Record # of good tiles and substract it if one of 'em is the mine */}
+    const checkGoodTile = () => {
+        if (moreMines != true) {
+            setNum_GoodTile(tiles.length);
+        }
+        else {
+            setNum_GoodTile(25);
+        }
+        for (var key in tiles) {
+            if (tiles[key].mine == true) {
+                setNum_GoodTile(num_GoodTile => num_GoodTile - 1);
+            }
+        }
+    }
+
+    const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
+
+    {/* User cannot select the same tile again or cannot select any tile unless game has begun, not bailed out, mine not found */ }
+    const disableSelected = (pos) => {
+        if (hasBegun == false || tiles[pos].selected == true || stop == true || mineFound == true) {
+            return true;
+        }
+    }
+
+    {/* Change selected tile's image to random points tile's image or mine if chosen during shuffle */ }
+    {/* If selected tile is not mine, increase countGood value by 1 for determining the win */}
+    const [countGood, setCountGood] = useState(0);
+    function givePoints(pos) {     
         let pointX = Math.floor(Math.random() * 4);
-        if (tiles[pos].selected == true && tiles[pos].bomb == false) {
+        if (tiles[pos].selected == true && tiles[pos].mine == false) {
             let temp = tiles;
             temp[pos].image = pointTile[pointX];
             setTiles({ ...temp });
             addScore(pos);
+            setCountGood(cg => cg + 1);
+            isWin(countGood);
         }
-        if (tiles[pos].selected == true && tiles[pos].bomb == true) {
+        if (tiles[pos].selected == true && tiles[pos].mine == true) {
             let temp = tiles;
-            temp[pos].image = bomb;
+            temp[pos].image = mine;
             setTiles({ ...temp });
             addScore(pos);
-            setBombFound(true);
-
+            setmineFound(true);
         }
     }
 
-    {/* Increase Score based on points tile's image given to selected tile - alert, reset score and time once bomb's found */ }
+    {/* Increase Score based on points tile's image given to selected tile - alert, reset score and time once mine's found */ }
     function addScore(pos) {
         if (tiles[pos].image == point100) {
             setScore(score + 100);
@@ -198,8 +232,8 @@ const EasyDifficulty = ({name}) => {
             setScore(score + 500);
         }
 
-        if (tiles[pos].image == bomb) {
-            Alert.alert("Bomb Found: Game Over!!!", "Shame, shame. You couldn't beat the game on easy mode and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with your dolls!");
+        if (tiles[pos].image == mine) {
+            Alert.alert("Mine Found: Game Over!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
             setScore(0);
             setCount(0);
             stopTimer();
@@ -216,31 +250,16 @@ const EasyDifficulty = ({name}) => {
 
     const showGuide = () => {
         Alert.alert("Instruction/Info",
-        "Click any bomb-free tile to score random points. You can bail out any time to keep your current scores. Getting the bomb means 'GAME OVER!'. Depending on the chosen difficulty, there may be more than one bomb. So, be careful!!!")
+        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Getting a mine means 'GAME OVER!'. Depending on the chosen difficulty, there may be more than 3 mines. So, be careful!!!")
     }
 
     const [bailout, setBailout] = useState(false);
     {/* Chicken Bail Out */ }
     function bailOut() {
             setStop(true);
-            Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it is You!")
+            Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
             setBailout(true);
             stopTimer();
-    }
-
-    let i = 0;
-    const [win, setWin] = useState(false);
-    const isWin = () => {
-        while (i < 30) { 
-            if (tiles[i].selected == true && tiles[i].image != bomb) {
-                setWin(true);
-                i++;
-            } else {
-                setWin(false);
-                i++;
-            }
-        }
-
     }
 
     return (
@@ -248,14 +267,14 @@ const EasyDifficulty = ({name}) => {
             {/* Score, timer, guide button */}
             <View style={{ marginLeft: 24, marginTop: 2, padding: 0, flexDirection: 'column' }}>
                 <Text style={{marginRight: 20, marginTop: 8, color: 'green'} }>Score: {score}</Text>
-                <Text style={{color: 'red' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
+                <Text style={{color: 'purple' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
                 <Pressable onPress={() => showGuide()}><Image source={guide} style={{ width: 20, height: 20, marginLeft: 2, marginTop: 9 }} /></Pressable>
             </View>
 
             {/* Player's name, difficulty */}
             <View style={{ marginLeft: 24, padding: 0, flexDirection: 'row' }}>
                 <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
-                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: 'green' }}>Easy</Text></Text>
+                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines? 'red':'green' }}>{g_Difficulty}</Text></Text>
             </View>
 
             {/* Tile grid in form of images  */}
@@ -290,22 +309,26 @@ const EasyDifficulty = ({name}) => {
                 <Pressable disabled={disableSelected(23) ? true : false} onPress={() => isSelected(23)}><Image source={tiles[23].image} style={styles.image} /></Pressable>
                 <Pressable disabled={disableSelected(24) ? true : false} onPress={() => isSelected(24)}><Image source={tiles[24].image} style={styles.image} /></Pressable>
 
-                <Pressable disabled={disableSelected(25) ? true : false} onPress={() => isSelected(25)}><Image source={tiles[25].image} style={styles.image} /></Pressable>
-                <Pressable disabled={disableSelected(26) ? true : false} onPress={() => isSelected(26)}><Image source={tiles[26].image} style={styles.image} /></Pressable>
-                <Pressable disabled={disableSelected(27) ? true : false} onPress={() => isSelected(27)}><Image source={tiles[27].image} style={styles.image} /></Pressable>
-                <Pressable disabled={disableSelected(28) ? true : false} onPress={() => isSelected(28)}><Image source={tiles[28].image} style={styles.image} /></Pressable>
-                <Pressable disabled={disableSelected(29) ? true : false} onPress={() => isSelected(29)}><Image source={tiles[29].image} style={styles.image} /></Pressable>
-
+                {moreTiles ?
+                    <View style={{flexDirection: 'row'}}>    
+                    <Pressable disabled={disableSelected(25) ? true : false} onPress={() => isSelected(25)}><Image source={tiles[25].image} style={styles.image} /></Pressable>
+                    <Pressable disabled={disableSelected(26) ? true : false} onPress={() => isSelected(26)}><Image source={tiles[26].image} style={styles.image} /></Pressable>
+                    <Pressable disabled={disableSelected(27) ? true : false} onPress={() => isSelected(27)}><Image source={tiles[27].image} style={styles.image} /></Pressable>
+                    <Pressable disabled={disableSelected(28) ? true : false} onPress={() => isSelected(28)}><Image source={tiles[28].image} style={styles.image} /></Pressable>
+                    <Pressable disabled={disableSelected(29) ? true : false} onPress={() => isSelected(29)}><Image source={tiles[29].image} style={styles.image} /></Pressable>
+                 </View>
+                : null
+            }
                 {/* Show when game's not begun */}
                 {
                     hasBegun ? null : <View style={{ marginTop: 30, width: 150 }}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
                 }
 
-                {/* Show bailout button, disable it once bomb's found  */}
+                {/* Show bailout button, disable it once mine's found  */}
                 {
                     hasBegun ?
                         <View style={{ marginTop: 15, marginLeft:1, width: 200 }}>
-                            <Button disabled={bombFound ? true : false} title="I am Done" style={styles.item} onPress={() => bailOut()} />
+                            <Button disabled={mineFound ? true : false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
                         </View>
                         : null
                 }
@@ -334,9 +357,9 @@ const EasyDifficulty = ({name}) => {
                         : null
                 }
 
-                {/* Show link button to next page once bomb's found */}
+                {/* Show link button to next page once mine's found */}
                 {
-                    bombFound ?
+                    mineFound ?
                         <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
                             <Link
                                 style={styles.button}

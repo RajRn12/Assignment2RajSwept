@@ -12,7 +12,7 @@ export default function Page() {
     const [proceed, setProceed] = useState(false);
 
     const isSelected = (difficulty) => {
-        if (difficulty != null) {
+        if (difficulty != '') {
             setSelected(true);
             setGameDifficulty(difficulty);
         }
@@ -31,13 +31,12 @@ export default function Page() {
                   proceed ? null :
                     <View>
                         <Text style={{fontSize: 24, fontWeight:'bold'}}>Instruction/Info:</Text>
-                        <Text style={styles.instruction}>Click on Any Tile. If it is not a bomb, you score random points :)</Text>
+                        <Text style={styles.instruction}>Click on Any Tile. If it is not a mine, you score random points :)</Text>
                         <Text style={styles.instruction}> You can quit early to keep your scores but you won't be admired :/</Text>
-                        <Text style={styles.instruction}>There will be some hidden bombs, so be careful!!!</Text>
-                        <Text style={styles.instruction}>You must choose all the bomb-free tiles to win the game:)</Text>
+                        <Text style={styles.instruction}>There will be some hidden mines, so be careful!!!</Text>
+                        <Text style={styles.instruction}>You must choose all the mine-free tiles to win the game:)</Text>
                         <Text style={[styles.instruction, {color: 'red'}]}>You must select the game difficulty before you can go to the actual game page.</Text>
-                        <Text style={styles.instruction}>On the game page, you must hit 'Start The Game' button to start the game.</Text>
-                        <Text style={[styles.instruction, {fontWeight:'bold', color:'red'}]}>The number of bombs increases as the difficulty increases.</Text>
+                            <Text style={[styles.instruction, { color: 'red' }]}>On the game page, you must hit 'Start The Game' button to start the game.</Text>
                     </View>
                 }
 
@@ -54,6 +53,7 @@ export default function Page() {
                     <View>
                         <Text style={[styles.instruction, { color: 'red', fontWeight: 'bold' }]}>You must select the game difficulty before you can go to the actual game page.</Text>
                         <Text style={[styles.instruction]}>"Player Name is not required"</Text>
+                        <Text style={[styles.instruction]}>(will be set to 'Unknown')</Text>
                     </View>
                     : null
                 }
@@ -78,9 +78,8 @@ export default function Page() {
                     proceed ?
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15, padding: 0, width: 200 }}>
                         <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Select Game Difficulty: </Text>
-                        <Button title="Easy" color = 'green' onPress={() => isSelected('Easy')} />
-                        <Button title="Medium" color = 'blue' onPress={() => isSelected('Medium')} />
-                        <Button title="Hard" color ='red' onPress={() => isSelected('Hard')} />
+                        <Button title="More Tiles" color = 'green' onPress={() => isSelected('MORE TILES')} />
+                        <Button title="More Mines" color = 'red' onPress={() => isSelected('MORE MINES')} />
                     </View>
                         : null
                 }
