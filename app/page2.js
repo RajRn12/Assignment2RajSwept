@@ -1,21 +1,24 @@
 /**
+ * File   -  page2.js
  * Credit - Stepehen Graham, Claire Fleckney, Stack Overflow
  * Author - Raj Rai
  */
 import { Link, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Image, Text, View, Pressable, Button, Alert, TextInput } from 'react-native';
+import { Image, Text, View, Pressable, Button, Alert} from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import tile from '../images/tile.jpg';
 import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
 import point400 from '../images/400.jpg';
 import point500 from '../images/500.jpg';
+import point800 from '../images/800.jpg';
+import point1000 from '../images/1000.jpg';
 import clock from '../images/clock.jpg';
 import guide from '../images/instruction.jpg';
 import styles from '../styles/page-styles';
 import mine from '../images/mine.jpg';
 
-export default function App() {
+export default function Page2() {
 
     const params = useLocalSearchParams();
     const {gameDifficulty, playerName} = params;
@@ -28,7 +31,7 @@ export default function App() {
 
 }
 
-{/* Easy Difficulty */ }
+{/* Main Game */}
 const MainGame = ({ name , difficulty }) => {
     const [tiles, setTiles] = useState([
         { image: tile, selected: false, mine: false },
@@ -88,6 +91,8 @@ const MainGame = ({ name , difficulty }) => {
 
     const [win, setWin] = useState(false);
 
+    const [bailout, setBailout] = useState(false);
+
     {/* Timer */ }
     {/* Set Player Name as Unkown if name's not entered */ }
     const [count, setCount] = useState(0);
@@ -110,7 +115,7 @@ const MainGame = ({ name , difficulty }) => {
         else {
             setP_Name("Unknown");
         }
-        if (hasBegun == true && count != 0 && win != true) {
+        if (hasBegun == true && count != 0 && win != true && stop != true) {
             timer.current = setInterval(() => {
                 setCount(c => c + 1);
             }, 1000);
@@ -130,6 +135,7 @@ const MainGame = ({ name , difficulty }) => {
         if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
             Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
             setWin(true);
+            setStop(true);
             stopTimer();
             setCount(c => c - 1);
         }
@@ -138,24 +144,23 @@ const MainGame = ({ name , difficulty }) => {
     {/* Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect */ }
     {/* Record # of good tiles for determining the win */}
     const begin = () => {
-        if (moreMines != true) {
-            shufflemine();
-            shufflemine();
-            shufflemine();
-        }
-        else {
-            shufflemine();
-            shufflemine();
-            shufflemine();
-            shufflemine();
+        if (moreMines == true) {
+            shuffleMine();
+            shuffleMine();
+            shuffleMine();
+            shuffleMine();
+        } else {
+            shuffleMine();
+            shuffleMine();
+            shuffleMine();
         }
         checkGoodTile();
         setHasBegun(true);
         setCount(1);
     }
 
-    {/* Shuffle mine - One mine For Easy Difficulty */ }
-    const shufflemine = () => {
+    {/* Shuffle mine - Different # of mines depending on game difficulty*/ }
+    const shuffleMine = () => {
         let x = 0;
         if (moreMines != true) {
              x = Math.floor(Math.random() * 30);
@@ -186,11 +191,11 @@ const MainGame = ({ name , difficulty }) => {
         }
     }
 
-    const [pointTile, setPointTile] = useState([point100, point200, point400, point500]);
+    const [pointTile, setPointTile] = useState([point100, point200, point400, point500, point800, point1000]);
 
     {/* User cannot select the same tile again or cannot select any tile unless game has begun, not bailed out, mine not found */ }
     const disableSelected = (pos) => {
-        if (hasBegun == false || tiles[pos].selected == true || stop == true || mineFound == true) {
+        if (hasBegun == false || tiles[pos].selected == true || stop == true) {
             return true;
         }
     }
@@ -199,7 +204,7 @@ const MainGame = ({ name , difficulty }) => {
     {/* If selected tile is not mine, increase countGood value by 1 for determining the win */}
     const [countGood, setCountGood] = useState(0);
     function givePoints(pos) {     
-        let pointX = Math.floor(Math.random() * 4);
+        let pointX = Math.floor(Math.random() * 6);
         if (tiles[pos].selected == true && tiles[pos].mine == false) {
             let temp = tiles;
             temp[pos].image = pointTile[pointX];
@@ -217,7 +222,7 @@ const MainGame = ({ name , difficulty }) => {
         }
     }
 
-    {/* Increase Score based on points tile's image given to selected tile - alert, reset score and time once mine's found */ }
+    {/* Increase Score by number based on points tile's image given to selected tile - alert, reset score and time once mine's found */ }
     function addScore(pos) {
         if (tiles[pos].image == point100) {
             setScore(score + 100);
@@ -231,11 +236,18 @@ const MainGame = ({ name , difficulty }) => {
         if (tiles[pos].image == point500) { 
             setScore(score + 500);
         }
+        if (tiles[pos].image == point800) {
+            setScore(score + 800);
+        }
+        if (tiles[pos].image == point1000) {
+            setScore(score + 1000);
+        }
 
         if (tiles[pos].image == mine) {
             Alert.alert("Mine Found: Game Over!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
             setScore(0);
             setCount(0);
+            setStop(true);
             stopTimer();
         }
     }
@@ -250,20 +262,27 @@ const MainGame = ({ name , difficulty }) => {
 
     const showGuide = () => {
         Alert.alert("Instruction/Info",
-        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Getting a mine means 'GAME OVER!'. Depending on the chosen difficulty, there may be more than 3 mines. So, be careful!!!")
+        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. You can go back to previous page to change difficulty and name too.")
     }
 
-    const [bailout, setBailout] = useState(false);
     {/* Chicken Bail Out */ }
     function bailOut() {
-            setStop(true);
-            Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
-            setBailout(true);
-            stopTimer();
+        setStop(true);
+        Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
+        setBailout(true);
+        stopTimer();
     }
-
+    function disableBailOut() {
+        if (stop == true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     return (
         <View style={styles.container}>
+            
             {/* Score, timer, guide button */}
             <View style={{ marginLeft: 24, marginTop: 2, padding: 0, flexDirection: 'column' }}>
                 <Text style={{marginRight: 20, marginTop: 8, color: 'green'} }>Score: {score}</Text>
@@ -327,8 +346,8 @@ const MainGame = ({ name , difficulty }) => {
                 {/* Show bailout button, disable it once mine's found  */}
                 {
                     hasBegun ?
-                        <View style={{ marginTop: 15, marginLeft:1, width: 200 }}>
-                            <Button disabled={mineFound ? true : false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
+                        <View style={{ marginTop: 15, marginLeft: 1, width: 200 }}>
+                            <Button disabled={disableBailOut? true: false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
                         </View>
                         : null
                 }
@@ -381,7 +400,29 @@ const MainGame = ({ name , difficulty }) => {
                         : null
                 }
            
-
+                {/* Show link button to next page once players win */}
+                {
+                    win ?
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
+                            <Link
+                                style={styles.button}
+                                href={{
+                                    pathname: "/page3",
+                                    params: {
+                                        p_Name,
+                                        score,
+                                        count
+                                    }
+                                }} asChild
+                            >
+                                {/* takes to second page upon pressing 'Click To Game Page' button */}
+                                <Pressable style={styles.button}>
+                                    <Text style={styles.buttonText}>Summary</Text>
+                                </Pressable>
+                            </Link>
+                        </View>
+                        : null
+                }
             </View>
 
         </View>

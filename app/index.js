@@ -1,9 +1,13 @@
-import { Pressable, Text, TextInput, View, Button} from 'react-native';
+/**
+ * File   -  index.js
+ * Author -  Raj Rai
+ */
+import { Pressable, Text, TextInput, View, Button } from 'react-native';
 import { Link } from 'expo-router'
 import styles from '../styles/page-styles';
 import React, { useState } from 'react';
 
-export default function Page() {
+export default function Page1() {
 
     const [gameDifficulty, setGameDifficulty] = useState('');
 

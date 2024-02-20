@@ -1,14 +1,13 @@
-/*
-Credit to: 
-Stephen Graham, 
-React Native Docs, 
-Raj Rai
-*/
+/**
+ * File   -  _layout.js
+ * Credit - Stepehen Graham
+ * Author - Raj Rai
+ */
 import { Stack } from 'expo-router';
 export default function Layout() {
 	return (
 		<Stack screenOptions={{
-			headerTitle: "Mine Swept",
+			headerTitle: "Mine Sweeper",
 			headerStyle: { backgroundColor: "gray" },
 			headerTitleStyle: {
 				fontWeight: "bold",
@@ -42,7 +41,7 @@ export default function Layout() {
 			<Stack.Screen
 				name="page3"
 				options={{
-					headerTitle: "Result",
+					headerTitle: "GAME SUMMARY",
 					headerShown: true,
 					headerTitleStyle: {
 						color: "white",

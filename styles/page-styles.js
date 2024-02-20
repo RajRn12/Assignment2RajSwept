@@ -1,4 +1,8 @@
-import { Text, StyleSheet } from 'react-native';
+/**
+ * File   -  page-styles.js
+ * Author - Raj Rai
+ */
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
