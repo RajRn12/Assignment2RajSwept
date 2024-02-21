@@ -6,7 +6,10 @@
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Image, Text, View, Pressable, Button, Alert} from 'react-native';
 import { useState, useEffect, useRef } from 'react';
+import { Audio } from 'expo-av';
 import tile from '../images/tile.jpg';
+import soundOn from '../images/soundOn.jpg';
+import soundOff from '../images/soundOff.jpg';
 import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
 import point400 from '../images/400.jpg';
@@ -32,7 +35,7 @@ export default function Page2() {
 }
 
 {/* Main Game */}
-const MainGame = ({ name , difficulty }) => {
+const MainGame = ({ name, difficulty }) => {
     const [tiles, setTiles] = useState([
         { image: tile, selected: false, mine: false },
         { image: tile, selected: false, mine: false },
@@ -77,27 +80,78 @@ const MainGame = ({ name , difficulty }) => {
 
     const [moreMines, setMoreMines] = useState(false);
 
-    const [random, setRandom] = useState(null);
-
     const [score, setScore] = useState(0);
-
-    const [hasBegun, setHasBegun] = useState(false);
 
     const [stop, setStop] = useState(false);
 
     const [mineFound, setmineFound] = useState(false);
 
-    const [num_GoodTile, setNum_GoodTile] = useState(0);
+    const [disableBailout, setDisableBailout] = useState(false);
 
-    const [win, setWin] = useState(false);
+    {/* Audio */ }
+    const [soundImg, setSoundImg] = useState([{ image: soundOn }]);
+    const [soundStatus, setSoundStatus] = useState('On');
 
-    const [bailout, setBailout] = useState(false);
+
+    {/* Sound Effects Toggle */ }
+    function toggleSoundEffects() {
+        let temp = soundImg;
+        if (soundImg[0].image == soundOn) {
+            temp[0].image = soundOff;
+            setSoundStatus('Off');
+            
+        } else {
+                   
+            temp[0].image = soundOn;
+            setSoundStatus('On');
+            playSound();
+        }
+        setSoundImg({ ...temp });
+    }
+
+    {/* Sound */ }
+    const [g_Sound, SetG_Sound] = useState(null);
+   
+
+    {/* Sound Effects */ }
+    const kalimba = require('../assets/sfx/kalimba.mp3');
+   
+    // load a sound
+    const loadSound = async (uri) => {
+        const { sound } = await Audio.Sound.createAsync(uri);
+        SetG_Sound(sound);
+    }
+
+    // unload a sound
+    const unloadSound = async () => {
+        await g_Sound.unloadAsync();
+        
+    }
+
+    const pauseSound = async () => {
+        await g_Sound.pauseAsync();
+    }
+
+    // play a sound
+    const playSound = async () => {
+        try {
+            await g_Sound.playAsync();
+        } catch (e) {
+            console.log(e)
+        };
+    }
+
+    // stop a sound
+    const stopSound = async () => {
+        await g_Sound.stopAsync();
+    }
 
     {/* Timer */ }
     {/* Set Player Name as Unkown if name's not entered */ }
     const [count, setCount] = useState(0);
     const timer = useRef(null);
     useEffect(() => {
+        loadSound(kalimba);
         // Difficulty
         if (difficulty == 'MORE TILES') {
             setMoreTiles(true);
@@ -113,15 +167,16 @@ const MainGame = ({ name , difficulty }) => {
             setP_Name(name);
         }
         else {
-            setP_Name("Unknown");
+            setP_Name("U.");
         }
-        if (hasBegun == true && count != 0 && win != true && stop != true) {
+        if (hasBegun == true && stop != true) {
             timer.current = setInterval(() => {
                 setCount(c => c + 1);
             }, 1000);
             isWin();
-            return () => clearInterval(timer.current)
-
+            return () => {
+                clearInterval(timer.current); unloadSound
+            }
         }
     }, [count]);
 
@@ -131,19 +186,23 @@ const MainGame = ({ name , difficulty }) => {
 
     { /* check Win */ }
     { /* Time stops a second later so the substraction is needed */ }
+    const [win, setWin] = useState(false);
     const isWin = () => {
         if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
-            Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
-            setWin(true);
             setStop(true);
             stopTimer();
+            Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
+            setWin(true);
+            setDisableBailout(true);
             setCount(c => c - 1);
         }
     }
 
     {/* Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect */ }
-    {/* Record # of good tiles for determining the win */}
+    {/* Record # of good tiles for determining the win */ }
+    const [hasBegun, setHasBegun] = useState(false);
     const begin = () => {
+        playSound();
         if (moreMines == true) {
             shuffleMine();
             shuffleMine();
@@ -160,9 +219,10 @@ const MainGame = ({ name , difficulty }) => {
     }
 
     {/* Shuffle mine - Different # of mines depending on game difficulty*/ }
+    const [random, setRandom] = useState(null);
     const shuffleMine = () => {
         let x = 0;
-        if (moreMines != true) {
+        if (moreTiles == true) {
              x = Math.floor(Math.random() * 30);
         }
         else {
@@ -176,10 +236,11 @@ const MainGame = ({ name , difficulty }) => {
         }
     }
 
-    {/* Record # of good tiles and substract it if one of 'em is the mine */}
+    {/* Record # of good tiles and substract it if one of 'em is the mine */ }
+    const [num_GoodTile, setNum_GoodTile] = useState(0);
     const checkGoodTile = () => {
         if (moreMines != true) {
-            setNum_GoodTile(tiles.length);
+            setNum_GoodTile(30);
         }
         else {
             setNum_GoodTile(25);
@@ -191,9 +252,7 @@ const MainGame = ({ name , difficulty }) => {
         }
     }
 
-    const [pointTile, setPointTile] = useState([point100, point200, point400, point500, point800, point1000]);
-
-    {/* User cannot select the same tile again or cannot select any tile unless game has begun, not bailed out, mine not found */ }
+    {/* User cannot select the same tile again or cannot select any tile unless game has begun, or stop not true*/ }
     const disableSelected = (pos) => {
         if (hasBegun == false || tiles[pos].selected == true || stop == true) {
             return true;
@@ -202,6 +261,7 @@ const MainGame = ({ name , difficulty }) => {
 
     {/* Change selected tile's image to random points tile's image or mine if chosen during shuffle */ }
     {/* If selected tile is not mine, increase countGood value by 1 for determining the win */}
+    const [pointTile, setPointTile] = useState([point100, point200, point400, point500, point800, point1000]);
     const [countGood, setCountGood] = useState(0);
     function givePoints(pos) {     
         let pointX = Math.floor(Math.random() * 6);
@@ -217,8 +277,14 @@ const MainGame = ({ name , difficulty }) => {
             let temp = tiles;
             temp[pos].image = mine;
             setTiles({ ...temp });
-            addScore(pos);
             setmineFound(true);
+
+            stopTimer();
+            setStop(true);
+            Alert.alert("Mine Found: Game Over!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
+            setScore(0);
+            setCount(0);
+            setDisableBailout(true);
         }
     }
 
@@ -242,14 +308,6 @@ const MainGame = ({ name , difficulty }) => {
         if (tiles[pos].image == point1000) {
             setScore(score + 1000);
         }
-
-        if (tiles[pos].image == mine) {
-            Alert.alert("Mine Found: Game Over!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
-            setScore(0);
-            setCount(0);
-            setStop(true);
-            stopTimer();
-        }
     }
 
     {/* Call necessary functions on selected tile */ }
@@ -260,43 +318,43 @@ const MainGame = ({ name , difficulty }) => {
         givePoints(pos);
     }
 
+    {/* Instruction and some info */}
     const showGuide = () => {
         Alert.alert("Instruction/Info",
-        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. You can go back to previous page to change difficulty and name too.")
+        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can toggle sound effects.")
     }
 
     {/* Chicken Bail Out */ }
+    const [bailout, setBailout] = useState(false);
     function bailOut() {
         setStop(true);
-        Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
-        setBailout(true);
         stopTimer();
+        setBailout(true);
+        setDisableBailout(true);
+
+        Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
+    
     }
-    function disableBailOut() {
-        if (stop == true) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+
     return (
         <View style={styles.container}>
-            
+
             {/* Score, timer, guide button */}
-            <View style={{ marginLeft: 24, marginTop: 2, padding: 0, flexDirection: 'column' }}>
+            <View style={{ marginLeft: 20, padding: 0, height: 80, flexDirection: 'column', width: 200}}>
                 <Text style={{marginRight: 20, marginTop: 8, color: 'green'} }>Score: {score}</Text>
                 <Text style={{color: 'purple' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
-                <Pressable onPress={() => showGuide()}><Image source={guide} style={{ width: 20, height: 20, marginLeft: 2, marginTop: 9 }} /></Pressable>
+                <Pressable style={{ width: 20 }} onPress={() => showGuide()}><Image source={guide} style={{ width: 20, height: 20, marginLeft: 1, marginTop: 9,}} /></Pressable>
             </View>
 
             {/* Player's name, difficulty */}
-            <View style={{ marginLeft: 24, padding: 0, flexDirection: 'row' }}>
-                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
-                <Text style={{ marginRight: 20, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines? 'red':'green' }}>{g_Difficulty}</Text></Text>
+            <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row',}}>
+                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
+                <Text style={{ marginRight: 18, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines? 'red':'green' }}>{g_Difficulty}</Text></Text>
+                <Pressable onPress={() => toggleSoundEffects()}><Image source={soundImg[0].image} style={{ width: 15, height: 15, marginTop: 10 }} /></Pressable>
+                <Text style={{ marginLeft: 4, marginTop: 8 }}>{soundStatus}</Text>
             </View>
 
-            {/* Tile grid in form of images  */}
+            {/* Tile grid in form of images - And Other Stuff */}
             <View style={styles.grid}>
                 <Pressable disabled={disableSelected(0) ? true : false} onPress={() => isSelected(0)}><Image source={tiles[0].image} style={styles.image} /></Pressable>
                 <Pressable disabled={disableSelected(1) ? true : false} onPress={() => isSelected(1)}><Image source={tiles[1].image} style={styles.image} /></Pressable>
@@ -340,14 +398,14 @@ const MainGame = ({ name , difficulty }) => {
             }
                 {/* Show when game's not begun */}
                 {
-                    hasBegun ? null : <View style={{ marginTop: 30, width: 150 }}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
+                    hasBegun ? null : <View style={{ marginTop: 15, width: 150 }}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
                 }
 
                 {/* Show bailout button, disable it once mine's found  */}
                 {
                     hasBegun ?
                         <View style={{ marginTop: 15, marginLeft: 1, width: 200 }}>
-                            <Button disabled={disableBailOut? true: false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
+                            <Button disabled={disableBailout ? true : false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
                         </View>
                         : null
                 }
@@ -355,7 +413,7 @@ const MainGame = ({ name , difficulty }) => {
                 {/* Show link button to next page once bailout button's been pressed */}
                 {
                     bailout ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
                             <Link
                                 style={styles.button}
                                 href={{
@@ -379,7 +437,7 @@ const MainGame = ({ name , difficulty }) => {
                 {/* Show link button to next page once mine's found */}
                 {
                     mineFound ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
                             <Link
                                 style={styles.button}
                                 href={{
@@ -403,7 +461,7 @@ const MainGame = ({ name , difficulty }) => {
                 {/* Show link button to next page once players win */}
                 {
                     win ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 305 }}>
+                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
                             <Link
                                 style={styles.button}
                                 href={{
