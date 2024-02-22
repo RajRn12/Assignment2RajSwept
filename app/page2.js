@@ -88,11 +88,9 @@ const MainGame = ({ name, difficulty }) => {
 
     const [disableBailout, setDisableBailout] = useState(false);
 
-    {/* Audio */ }
+    {/* Audio Img */ }
     const [soundImg, setSoundImg] = useState([{ image: soundOn }]);
     const [soundStatus, setSoundStatus] = useState('On');
-
-
     {/* Sound Effects Toggle */ }
     function toggleSoundEffects() {
         let temp = soundImg;
@@ -109,33 +107,18 @@ const MainGame = ({ name, difficulty }) => {
         setSoundImg({ ...temp });
     }
 
-    {/* Sound */ }
-    const [g_Sound, SetG_Sound] = useState(null);
-   
-
-    {/* Sound Effects */ }
+    const [myPBO, setMyPBO] = useState(null);
     const kalimba = require('../assets/sfx/kalimba.mp3');
-   
+
     // load a sound
     const loadSound = async (uri) => {
         const { sound } = await Audio.Sound.createAsync(uri);
-        SetG_Sound(sound);
+        setMyPBO(sound);
     }
-
-    // unload a sound
-    const unloadSound = async () => {
-        await g_Sound.unloadAsync();
-        
-    }
-
-    const pauseSound = async () => {
-        await g_Sound.pauseAsync();
-    }
-
     // play a sound
     const playSound = async () => {
         try {
-            await g_Sound.playAsync();
+            await myPBO.playAsync();
         } catch (e) {
             console.log(e)
         };
@@ -143,15 +126,30 @@ const MainGame = ({ name, difficulty }) => {
 
     // stop a sound
     const stopSound = async () => {
-        await g_Sound.stopAsync();
+        await myPBO.stopAsync();
     }
+    // unload a sound
+    const unloadSound = async () => {
+        await myPBO.unloadAsync();
+        setPlaybackStatus("Unloaded");
+    }
+
+    useEffect(() => {
+        loadSound(kalimba);
+        return myPBO
+            ? () => {
+                unloadSound
+            }
+            : undefined;
+
+    }, [])
+
 
     {/* Timer */ }
     {/* Set Player Name as Unkown if name's not entered */ }
     const [count, setCount] = useState(0);
     const timer = useRef(null);
     useEffect(() => {
-        loadSound(kalimba);
         // Difficulty
         if (difficulty == 'MORE TILES') {
             setMoreTiles(true);
@@ -175,7 +173,7 @@ const MainGame = ({ name, difficulty }) => {
             }, 1000);
             isWin();
             return () => {
-                clearInterval(timer.current); unloadSound
+                clearInterval(timer.current);
             }
         }
     }, [count]);
@@ -349,9 +347,15 @@ const MainGame = ({ name, difficulty }) => {
             {/* Player's name, difficulty */}
             <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row',}}>
                 <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
-                <Text style={{ marginRight: 18, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines? 'red':'green' }}>{g_Difficulty}</Text></Text>
-                <Pressable onPress={() => toggleSoundEffects()}><Image source={soundImg[0].image} style={{ width: 15, height: 15, marginTop: 10 }} /></Pressable>
-                <Text style={{ marginLeft: 4, marginTop: 8 }}>{soundStatus}</Text>
+                <Text style={{ marginRight: 18, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
+                <Pressable
+                    style={styles.button}
+                    onPress={stopSound}
+                >
+                    <Text style={styles.buttonText}>
+                        Stop
+                    </Text>
+                </Pressable>
             </View>
 
             {/* Tile grid in form of images - And Other Stuff */}
