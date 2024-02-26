@@ -35,18 +35,16 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: 'lightgreen',
         borderBlockColor: 'black',
         borderStyle: 'solid',
         borderWidth: 2,
         borderRadius: 7,
         padding: 2,
-        width: 100,
-        height: 40,
+        marginTop:3
+        
     },
     buttonText: {
         textAlign:'center',
-        fontSize: 20,
     },
 
     input: {

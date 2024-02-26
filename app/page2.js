@@ -8,8 +8,6 @@ import { Image, Text, View, Pressable, Button, Alert} from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { Audio } from 'expo-av';
 import tile from '../images/tile.jpg';
-import soundOn from '../images/soundOn.jpg';
-import soundOff from '../images/soundOff.jpg';
 import point100 from '../images/100.jpg';
 import point200 from '../images/200.jpg';
 import point400 from '../images/400.jpg';
@@ -88,25 +86,9 @@ const MainGame = ({ name, difficulty }) => {
 
     const [disableBailout, setDisableBailout] = useState(false);
 
-    {/* Audio Img */ }
-    const [soundImg, setSoundImg] = useState([{ image: soundOn }]);
-    const [soundStatus, setSoundStatus] = useState('On');
-    {/* Sound Effects Toggle */ }
-    function toggleSoundEffects() {
-        let temp = soundImg;
-        if (soundImg[0].image == soundOn) {
-            temp[0].image = soundOff;
-            setSoundStatus('Off');
-            
-        } else {
-                   
-            temp[0].image = soundOn;
-            setSoundStatus('On');
-            playSound();
-        }
-        setSoundImg({ ...temp });
-    }
+    const [playedMusic, setPlayedMusic] = useState(false);
 
+    {/* Audio File */ }
     const [myPBO, setMyPBO] = useState(null);
     const kalimba = require('../assets/sfx/kalimba.mp3');
 
@@ -119,6 +101,7 @@ const MainGame = ({ name, difficulty }) => {
     const playSound = async () => {
         try {
             await myPBO.playAsync();
+            setPlayedMusic(true);
         } catch (e) {
             console.log(e)
         };
@@ -127,6 +110,7 @@ const MainGame = ({ name, difficulty }) => {
     // stop a sound
     const stopSound = async () => {
         await myPBO.stopAsync();
+        setPlayedMusic(false);
     }
     // unload a sound
     const unloadSound = async () => {
@@ -147,7 +131,7 @@ const MainGame = ({ name, difficulty }) => {
 
     {/* Timer */ }
     {/* Set Player Name as Unkown if name's not entered */ }
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(null);
     const timer = useRef(null);
     useEffect(() => {
         // Difficulty
@@ -213,7 +197,7 @@ const MainGame = ({ name, difficulty }) => {
         }
         checkGoodTile();
         setHasBegun(true);
-        setCount(1);
+        setCount(0);
     }
 
     {/* Shuffle mine - Different # of mines depending on game difficulty*/ }
@@ -319,7 +303,7 @@ const MainGame = ({ name, difficulty }) => {
     {/* Instruction and some info */}
     const showGuide = () => {
         Alert.alert("Instruction/Info",
-        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can toggle sound effects.")
+        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can stop music or play music.")
     }
 
     {/* Chicken Bail Out */ }
@@ -348,14 +332,35 @@ const MainGame = ({ name, difficulty }) => {
             <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row',}}>
                 <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
                 <Text style={{ marginRight: 18, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
+                { playedMusic?
                 <Pressable
-                    style={styles.button}
+                        style={{
+                            borderStyle: 'solid',
+                            borderWidth: 2,
+                            borderRadius: 7,
+                            marginTop: 3,
+                        }}
                     onPress={stopSound}
                 >
-                    <Text style={styles.buttonText}>
-                        Stop
+                        <Text style={{ fontSize: 16, textAlign: 'center', }}>
+                        Stop Music
                     </Text>
                 </Pressable>
+                :
+                    <Pressable
+                        style={{
+                            borderStyle: 'solid',
+                            borderWidth: 2,
+                            borderRadius: 7,
+                            marginTop: 3,
+                        }}
+                        onPress={playSound}
+                    >
+                        <Text style={{ fontSize: 16, textAlign: 'center', }}>
+                            Play Music
+                        </Text>
+                    </Pressable>
+                }
             </View>
 
             {/* Tile grid in form of images - And Other Stuff */}

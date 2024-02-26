@@ -24,6 +24,9 @@ export default function Page1() {
 
     const [playerName, onChangePlayerName] = useState("");
 
+
+    {/* Get Initials */ }
+
     return (
         <View style={styles.container}>       
             <View style={{ marginTop: 6, marginLeft: 5 }}>
@@ -70,11 +73,11 @@ export default function Page1() {
                             onChangeText={onChangePlayerName}
                             value={playerName}
                             placeholder={""}
-                        />
+                            />
                         </View>
                  : null 
                 }
-
+                
                 {/* Select proceed to display the list of difficulties to choose from*/}
                 {
                     proceed ?
