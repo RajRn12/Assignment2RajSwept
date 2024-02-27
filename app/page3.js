@@ -19,6 +19,7 @@ export default function Page3() {
         Alert.alert("Nice", "" + playerList[id].name + playerList[id].id);
         setT(t => t + 1);
     }
+
     return (
         <View style={styles.container}>
             <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 24 }}>{currentSum[0].title}</Text>
@@ -29,8 +30,20 @@ export default function Page3() {
                 <Text style={{ fontWeight: 'bold', fontSize: 15, color: "brown" }}>Time: {currentSum[0].time}s</Text>
             </View>
 
-            <View style={{width: 180, marginLeft: 89, marginTop: 10 }}>
-                <Button title="Show Leaderboard"/>
+            <View style={{ alignItems:"center", marginTop:10 }}>
+            <Pressable
+                style={{backgroundColor: 'orange',
+                     borderBlockColor: 'black',
+                     borderStyle: 'solid',
+                    height: 30,
+                    width: 200,
+                    justifyContent: 'center',
+                    alignItems:'center',
+                    borderWidth: 2,
+                    borderRadius: 7,
+                   }}>
+                <Text style={{textAlign:'center', fontSize:17, color:"black"}}>Show Leaderboard</Text>
+                </Pressable>
             </View>
             {/*<FlatList */}
             {/*    keyExtractor={(item) => item.id}*/}
