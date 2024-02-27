@@ -11,6 +11,19 @@ const styles = StyleSheet.create({
         alignItems: ''
         
     },
+    item: {
+        marginTop: 24,
+        padding: 20,
+        backgroundColor: 'pink',
+        fontSize: 16,
+        textAlign: 'center',
+        color: 'black',
+        borderWidth: 1,
+        alignItems: 'center',
+        borderStyle:'dashed'
+
+
+    },
     grid: {
         marginTop: 13,
         flexDirection: 'row',

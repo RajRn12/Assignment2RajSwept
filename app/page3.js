@@ -1,46 +1,44 @@
-/**
+﻿/**
  * File   -  page3.js
  * Credit - Stepehen Graham
  * Author - Raj Rai
  */
 import { Link, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Image, Text, View, Pressable, Button, Alert, TextInput } from 'react-native';
+import { StyleSheet, Image, Text, View, Pressable, Button, Alert, FlatList } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import styles from '../styles/page-styles';
 export default function Page3() {
 
     const params = useLocalSearchParams();
-    const { p_Name, score, count } = params;
-    const [playerList, setPlayerList] = useState([{ name: '', score_: 0, time: 0 }])
-
-    useEffect(() => {
-        let i = 0;
-        while (i < playerList.length) {
-            if (playerList[i].name == p_Name) {
-                let temp = playerList;
-                temp[i].score_ = score;
-                temp[i].time = count;
-                setPlayerList({ ...temp });
-            }
-            else {
-                let temp = playerList;
-                temp[i].push. = p_Name;
-                temp[i].score_ = score;
-                temp[i].time = count;
-                setPlayerList({ ...temp });
-            }
-            i++;
-        }
-
-    }, [])
+    const { g_Difficulty, p_Name, score, count, currentP, playerTitle } = params;
+    const [playerList, setPlayerList] = useState([{ id: 0, name: currentP, scores: 0, time: 0 }])
+    const [currentSum, setCurrentSum] = useState([{ title: playerTitle, name: currentP, scores_: score, time: count }])
+    const [show, setShow] = useState(false);
 
     const PressMe = (id) => {
-        Alert.alert("Nice", "" + playerList[id].name);
+        Alert.alert("Nice", "" + playerList[id].name + playerList[id].id);
+        setT(t => t + 1);
     }
     return (
         <View style={styles.container}>
-            <Button title="Testing" onPress={() => PressMe(0) } />
-            <Button title="Testing" onPress={() => PressMe(1) } />
+            <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 24 }}>{currentSum[0].title}</Text>
+            <View style={styles.item}>
+                <Text style={{ fontWeight: 'bold', fontSize: 16, color: "#ff0000" }}>⭐Personal Best Record⭐</Text>
+                <Text style={{fontWeight: 'bold', fontSize: 15, color:"blue" }}>Name: {currentSum[0].name} </Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 15, color: "green" }}>Score: {currentSum[0].scores_}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 15, color: "brown" }}>Time: {currentSum[0].time}s</Text>
+            </View>
+
+            <View style={{width: 180, marginLeft: 89, marginTop: 10 }}>
+                <Button title="Show Leaderboard"/>
+            </View>
+            {/*<FlatList */}
+            {/*    keyExtractor={(item) => item.id}*/}
+            {/*    data={playerList}*/}
+            {/*    renderItem={({ item }) => (*/}
+            {/*        <Text style={styles.item}>{item.name}</Text>*/}
+            {/*    )}*/}
+            {/*/>*/}
         </View>
     );
 

@@ -70,9 +70,9 @@ const MainGame = ({ name, difficulty }) => {
         { image: tile, selected: false, mine: false },
     ]);
 
-    const [p_Name, setP_Name] = useState('');
-
     const [g_Difficulty, setG_Difficulty] = useState('');
+
+    const [playerTitle, setPlayerTitle] = useState('');
 
     const [moreTiles, setMoreTiles] = useState(false);
 
@@ -131,6 +131,8 @@ const MainGame = ({ name, difficulty }) => {
 
     {/* Timer */ }
     {/* Set Player Name as Unkown if name's not entered */ }
+    const [p_Name, setP_Name] = useState([{ name: '' }]);
+    const [currentP, setCurrentP] = useState('');
     const [count, setCount] = useState(null);
     const timer = useRef(null);
     useEffect(() => {
@@ -144,12 +146,22 @@ const MainGame = ({ name, difficulty }) => {
             setG_Difficulty('MORE MINES')
         }
 
-        // Name
-        if (name != '') {
-            setP_Name(name);
-        }
-        else {
-            setP_Name("Unkown");
+        // Name - Replay as current - Play as New
+        let i = 0;
+        while (i < p_Name.length) {
+            if (p_Name[i].name == '' && name != '') {
+                let temp = p_Name;
+                temp[i].name = name;
+                setP_Name(...temp);
+                setCurrentP(name);
+            }
+            if (name == '') {
+                let temp = p_Name;
+                temp[i].name = 'Unkown';
+                setP_Name(...temp);
+                setCurrentP('Unkown');
+            }
+            i++;
         }
         if (hasBegun == true && stop != true) {
             timer.current = setInterval(() => {
@@ -171,6 +183,7 @@ const MainGame = ({ name, difficulty }) => {
     const [win, setWin] = useState(false);
     const isWin = () => {
         if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
+            setPlayerTitle('Winner🏆');
             setStop(true);
             stopTimer();
             Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
@@ -261,6 +274,7 @@ const MainGame = ({ name, difficulty }) => {
             setTiles({ ...temp });
             setmineFound(true);
 
+            setPlayerTitle("Loser💀");
             stopTimer();
             setStop(true);
             Alert.alert("Mine Found: You Lost!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
@@ -309,6 +323,7 @@ const MainGame = ({ name, difficulty }) => {
     {/* Chicken Bail Out */ }
     const [bailout, setBailout] = useState(false);
     function bailOut() {
+        setPlayerTitle("Chicken🐔");
         setStop(true);
         stopTimer();
         setBailout(true);
@@ -329,8 +344,8 @@ const MainGame = ({ name, difficulty }) => {
             </View>
 
             {/* Player's name, difficulty */}
-            <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row',}}>
-                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
+            <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row', }}>
+                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{currentP}</Text></Text>
                 <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
                 { playedMusic?
                 <Pressable
@@ -414,7 +429,7 @@ const MainGame = ({ name, difficulty }) => {
                 {
                     hasBegun ?
                         <View style={{ marginTop: 15, marginLeft: 1, width: 200 }}>
-                            <Button disabled={disableBailout ? true : false} title="I Quit" style={styles.item} onPress={() => bailOut()} />
+                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => bailOut()} />
                         </View>
                         : null
                 }
@@ -428,7 +443,10 @@ const MainGame = ({ name, difficulty }) => {
                                 href={{
                                     pathname: "/page3",
                                     params: {
+                                        g_Difficulty,
                                         p_Name,
+                                        currentP,
+                                        playerTitle,
                                         score,
                                         count
                                     }
@@ -452,7 +470,10 @@ const MainGame = ({ name, difficulty }) => {
                                 href={{
                                     pathname: "/page3",
                                     params: {
+                                        g_Difficulty,
                                         p_Name,
+                                        currentP,
+                                        playerTitle,
                                         score,
                                         count
                                     }
@@ -476,7 +497,10 @@ const MainGame = ({ name, difficulty }) => {
                                 href={{
                                     pathname: "/page3",
                                     params: {
+                                        g_Difficulty,
                                         p_Name,
+                                        currentP,
+                                        playerTitle,
                                         score,
                                         count
                                     }
