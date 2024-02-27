@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File   -  page2.js
  * Credit - Stepehen Graham, Claire Fleckney, Stack Overflow
  * Author - Raj Rai
@@ -149,7 +149,7 @@ const MainGame = ({ name, difficulty }) => {
             setP_Name(name);
         }
         else {
-            setP_Name("U.");
+            setP_Name("Unkown");
         }
         if (hasBegun == true && stop != true) {
             timer.current = setInterval(() => {
@@ -263,7 +263,7 @@ const MainGame = ({ name, difficulty }) => {
 
             stopTimer();
             setStop(true);
-            Alert.alert("Mine Found: Game Over!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
+            Alert.alert("Mine Found: You Lost!!!", "Shame, shame. You couldn't beat the game and you missed your chance to become the chicken, too!. Turn off your device immediately, and go play with a toy!");
             setScore(0);
             setCount(0);
             setDisableBailout(true);
@@ -331,7 +331,7 @@ const MainGame = ({ name, difficulty }) => {
             {/* Player's name, difficulty */}
             <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row',}}>
                 <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{p_Name}</Text></Text>
-                <Text style={{ marginRight: 18, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
+                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
                 { playedMusic?
                 <Pressable
                         style={{
@@ -343,7 +343,7 @@ const MainGame = ({ name, difficulty }) => {
                     onPress={stopSound}
                 >
                         <Text style={{ fontSize: 16, textAlign: 'center', }}>
-                        Stop Music
+                            Stop ♬
                     </Text>
                 </Pressable>
                 :
@@ -357,7 +357,7 @@ const MainGame = ({ name, difficulty }) => {
                         onPress={playSound}
                     >
                         <Text style={{ fontSize: 16, textAlign: 'center', }}>
-                            Play Music
+                            Play ♬
                         </Text>
                     </Pressable>
                 }

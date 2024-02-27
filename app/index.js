@@ -24,9 +24,6 @@ export default function Page1() {
 
     const [playerName, onChangePlayerName] = useState("");
 
-
-    {/* Get Initials */ }
-
     return (
         <View style={styles.container}>       
             <View style={{ marginTop: 6, marginLeft: 5 }}>
@@ -56,9 +53,9 @@ export default function Page1() {
                 {proceed ?
                     <View>
                         <Text style={[styles.instruction, { color: 'red', fontWeight: 'bold' }]}>You must select the game difficulty before you can go to the actual game page.</Text>
-                        <Text style={[styles.instruction, { color: 'red'}]}>'Name will be set to its initials'</Text>
+                        <Text style={[styles.instruction, { color: 'red'}]}>'Name - 8 characters max'</Text>
                         <Text style={[styles.instruction]}>"Name is not required"</Text>
-                        <Text style={[styles.instruction]}>(will be set to initial 'U.' for Word 'Unkown')</Text>
+                        <Text style={[styles.instruction]}>(will be set to 'Unkown')</Text>
                     </View>
                     : null
                 }
@@ -70,6 +67,7 @@ export default function Page1() {
                         <Text style={{ fontSize: 15, fontWeight: 'bold', marginTop: 8, }}> Enter Name: </Text>
                         <TextInput
                             style={styles.input}
+                                maxLength={8}
                             onChangeText={onChangePlayerName}
                             value={playerName}
                             placeholder={""}

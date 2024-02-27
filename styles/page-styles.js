@@ -35,8 +35,11 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        backgroundColor: 'lightgreen',
         borderBlockColor: 'black',
         borderStyle: 'solid',
+        width: 100,
+        height:35,
         borderWidth: 2,
         borderRadius: 7,
         padding: 2,
