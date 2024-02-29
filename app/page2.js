@@ -91,7 +91,7 @@ const MainGame = ({ name, difficulty }) => {
     {/* Audio File */ }
     const [myPBO, setMyPBO] = useState(null);
     const kalimba = require('../assets/sfx/kalimba.mp3');
-
+    const chicken = require('../assets/sfx/chicken.mp3');
     // load a sound
     const loadSound = async (uri) => {
         const { sound } = await Audio.Sound.createAsync(uri);
@@ -115,26 +115,38 @@ const MainGame = ({ name, difficulty }) => {
     // unload a sound
     const unloadSound = async () => {
         await myPBO.unloadAsync();
-        setPlaybackStatus("Unloaded");
     }
 
+    const [beginNum, setBeginNum] = useState(0);
     useEffect(() => {
-        loadSound(kalimba);
+        if (beginNum == 0) {
+            loadSound(kalimba);
+        }
+        if (stop != true && beginNum == 1) {
+            playSound();
+        }
         return myPBO
             ? () => {
                 unloadSound
             }
             : undefined;
 
-    }, [])
+    }, [beginNum])
 
+    const [bail, setBail] = useState(0);
+    useEffect(() => {
+        if (bail > 0) {
+            //unloadSound();
+            //loadSound(chicken);
+        }
+        return myPBO
+            ? () => {
+                unloadSound
+            }
+            : undefined;
+    }, [ bail ])
 
-    {/* Timer */ }
-    {/* Set Player Name as Unkown if name's not entered */ }
-    const [p_Name, setP_Name] = useState([{ name: '' }]);
-    const [currentP, setCurrentP] = useState('');
-    const [count, setCount] = useState(null);
-    const timer = useRef(null);
+    {/* Render once */ }
     useEffect(() => {
         // Difficulty
         if (difficulty == 'MORE TILES') {
@@ -163,6 +175,15 @@ const MainGame = ({ name, difficulty }) => {
             }
             i++;
         }
+    }, [])
+
+    {/* Timer */ }
+    {/* Set Player Name as Unkown if name's not entered */ }
+    const [p_Name, setP_Name] = useState([{ name: '' }]);
+    const [currentP, setCurrentP] = useState('');
+    const [count, setCount] = useState(null);
+    const timer = useRef(null);
+    useEffect(() => {
         if (hasBegun == true && stop != true) {
             timer.current = setInterval(() => {
                 setCount(c => c + 1);
@@ -197,7 +218,7 @@ const MainGame = ({ name, difficulty }) => {
     {/* Record # of good tiles for determining the win */ }
     const [hasBegun, setHasBegun] = useState(false);
     const begin = () => {
-        playSound();
+        setBeginNum(beginNum => beginNum + 1);
         if (moreMines == true) {
             shuffleMine();
             shuffleMine();
@@ -323,55 +344,44 @@ const MainGame = ({ name, difficulty }) => {
     {/* Chicken Bail Out */ }
     const [bailout, setBailout] = useState(false);
     function bailOut() {
+        setBail(1);
         setPlayerTitle("Chicken🐔");
         setStop(true);
         stopTimer();
         setBailout(true);
         setDisableBailout(true);
-
         Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
-    
     }
 
     return (
         <View style={styles.container}>
 
             {/* Score, timer, guide button */}
-            <View style={{ marginLeft: 20, padding: 0, height: 80, flexDirection: 'column', width: 200}}>
-                <Text style={{marginRight: 20, marginTop: 8, color: 'green'} }>Score: {score}</Text>
+            <View style={styles.statView}>
+                <Text style={styles.score}>Score: {score}</Text>
                 <Text style={{color: 'purple' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
-                <Pressable style={{ width: 20 }} onPress={() => showGuide()}><Image source={guide} style={{ width: 20, height: 20, marginLeft: 1, marginTop: 9,}} /></Pressable>
+                <Pressable style={{ width: 20 }} onPress={() => showGuide()}><Image source={guide} style={styles.guide} /></Pressable>
             </View>
 
             {/* Player's name, difficulty */}
-            <View style={{ marginLeft: 20, padding: 0, flexDirection: 'row', }}>
-                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Name: <Text style={{ color: 'blue' }}>{currentP}</Text></Text>
-                <Text style={{ marginRight: 15, marginTop: 8, color: 'black' }}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
+            <View style={styles.matchInfoView}>
+                <Text style={styles.matchInfo}>Name: <Text style={{ color: 'blue' }}>{currentP}</Text></Text>
+                <Text style={styles.matchInfo}>Difficulty: <Text style={{ color: moreMines ? 'red' : 'green' }}>{g_Difficulty}</Text></Text>
                 { playedMusic?
                 <Pressable
-                        style={{
-                            borderStyle: 'solid',
-                            borderWidth: 2,
-                            borderRadius: 7,
-                            marginTop: 3,
-                        }}
+                    style={styles.toggleMusic}
                     onPress={stopSound}
                 >
-                        <Text style={{ fontSize: 16, textAlign: 'center', }}>
+                        <Text style={styles.toggleText}>
                             Stop ♬
                     </Text>
                 </Pressable>
                 :
                     <Pressable
-                        style={{
-                            borderStyle: 'solid',
-                            borderWidth: 2,
-                            borderRadius: 7,
-                            marginTop: 3,
-                        }}
+                        style={styles.toggleMusic}
                         onPress={playSound}
                     >
-                        <Text style={{ fontSize: 16, textAlign: 'center', }}>
+                        <Text style={styles.toggleText}>
                             Play ♬
                         </Text>
                     </Pressable>
@@ -422,14 +432,14 @@ const MainGame = ({ name, difficulty }) => {
             }
                 {/* Show when game's not begun */}
                 {
-                    hasBegun ? null : <View style={{ marginTop: 15, width: 150 }}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
+                    hasBegun ? null : <View style={styles.startView}><Button title="Start The Game" color='green' onPress={() => begin()} /></View>
                 }
 
                 {/* Show bailout button, disable it once mine's found  */}
                 {
                     hasBegun ?
-                        <View style={{ marginTop: 15, marginLeft: 1, width: 200 }}>
-                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => bailOut()} />
+                        <View style={styles.bailoutView}>
+                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => { bailOut()}} />
                         </View>
                         : null
                 }
@@ -437,9 +447,8 @@ const MainGame = ({ name, difficulty }) => {
                 {/* Show link button to next page once bailout button's been pressed */}
                 {
                     bailout ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
+                        <View style={styles.linkView}>
                             <Link
-                                style={styles.button}
                                 href={{
                                     pathname: "/page3",
                                     params: {
@@ -453,8 +462,8 @@ const MainGame = ({ name, difficulty }) => {
                                 }} asChild
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
-                                <Pressable style={styles.button}>
-                                    <Text style={styles.buttonText}>Summary</Text>
+                                <Pressable style={styles.button} onPress={ () => stopSound()}>
+                                    <Text style={styles.buttonText}>Result</Text>
                                 </Pressable>
                             </Link>
                         </View>
@@ -464,9 +473,8 @@ const MainGame = ({ name, difficulty }) => {
                 {/* Show link button to next page once mine's found */}
                 {
                     mineFound ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
+                        <View style={styles.linkView}>
                             <Link
-                                style={styles.button}
                                 href={{
                                     pathname: "/page3",
                                     params: {
@@ -480,8 +488,8 @@ const MainGame = ({ name, difficulty }) => {
                                 }} asChild
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
-                                <Pressable style={styles.button}>
-                                    <Text style={styles.buttonText}>Summary</Text>
+                                <Pressable style={styles.button} onPress={() => stopSound()}>
+                                    <Text style={styles.buttonText}>Result</Text>
                                 </Pressable>
                             </Link>
                         </View>
@@ -491,9 +499,8 @@ const MainGame = ({ name, difficulty }) => {
                 {/* Show link button to next page once players win */}
                 {
                     win ?
-                        <View style={{ marginTop: 15, marginLeft: 204, marginRight: 302 }}>
+                        <View style={styles.linkView}>
                             <Link
-                                style={styles.button}
                                 href={{
                                     pathname: "/page3",
                                     params: {
@@ -507,8 +514,8 @@ const MainGame = ({ name, difficulty }) => {
                                 }} asChild
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
-                                <Pressable style={styles.button}>
-                                    <Text style={styles.buttonText}>Summary</Text>
+                                <Pressable style={styles.button} onPress={() => stopSound()}>
+                                    <Text style={styles.buttonText}>Result</Text>
                                 </Pressable>
                             </Link>
                         </View>
