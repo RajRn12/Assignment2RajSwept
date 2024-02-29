@@ -16,7 +16,7 @@ export default function Page3() {
     const [pBRLabel, setPBRLabel] = useState('')
 
     const [show, setShow] = useState(false);
-    const [restart, setRestart] = useState('Restart');
+    const [restart, setRestart] = useState(false);
 
     function showIt() {
         if (show == true) {
@@ -115,7 +115,7 @@ export default function Page3() {
                         }} asChild
                     >
                         {/* takes to second page upon pressing 'Click To Game Page' button */}
-                        <Pressable style={styles.restartGameBtn}>
+                        <Pressable style={styles.restartGameBtn} onPress={() => setRestart(true)}>
                             <Text style={styles.buttonText}>Restart Game</Text>
                         </Pressable>
                     </Link>

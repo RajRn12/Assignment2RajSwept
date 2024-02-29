@@ -28,10 +28,18 @@ export default function Page1() {
     const [playerName, onChangePlayerName] = useState("");
 
     function reset() {
-        if (restart == 'Restart') {
+        if (restart) {
+            setProceed(false);
+            setSelected(false);
             onChangePlayerName("");
         }
     }
+
+    useEffect(() => {
+        if (restart) {
+            reset();
+        }
+    }, [restart])
 
     return (
         <View style={styles.container}>       

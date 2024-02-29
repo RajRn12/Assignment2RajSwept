@@ -89,18 +89,26 @@ const MainGame = ({ name, difficulty }) => {
     const [playedMusic, setPlayedMusic] = useState(false);
 
     {/* Audio File */ }
-    const [myPBO, setMyPBO] = useState(null);
+    const [pBOMusic, setPBOMusic] = useState(null);
+    const [pBOChicken, setPBOChicken] = useState(null);
+
     const kalimba = require('../assets/sfx/kalimba.mp3');
     const chicken = require('../assets/sfx/chicken.mp3');
     // load a sound
-    const loadSound = async (uri) => {
-        const { sound } = await Audio.Sound.createAsync(uri);
-        setMyPBO(sound);
+    const loadSound = async () => {
+        const { kalim } = await Audio.Sound.createAsync(require('../assets/sfx/kalimba.mp3'));
+        const { chick } = await Audio.Sound.createAsync(require('../assets/sfx/chicken.mp3'));     
+        setPBOMusic(kalim);
+        setPBOChicken(chick);
     }
     // play a sound
     const playSound = async () => {
         try {
-            await myPBO.playAsync();
+            if (beginNum && bailout != true) {
+                await pBOMusic.playAsync();
+            } else {
+                stopSound();
+            }
             setPlayedMusic(true);
         } catch (e) {
             console.log(e)
@@ -109,42 +117,38 @@ const MainGame = ({ name, difficulty }) => {
 
     // stop a sound
     const stopSound = async () => {
-        await myPBO.stopAsync();
+        if (bailout == true) {
+            await pBOMusic.stopAsync();
+            await pBOChicken.playAsync();
+        }
         setPlayedMusic(false);
     }
-    // unload a sound
-    const unloadSound = async () => {
-        await myPBO.unloadAsync();
-    }
+
+    //// unload a sound
+    //const unloadSound = async () => {
+    //    await myPBO.unloadAsync();
+    //}
 
     const [beginNum, setBeginNum] = useState(0);
     useEffect(() => {
-        if (beginNum == 0) {
-            loadSound(kalimba);
-        }
-        if (stop != true && beginNum == 1) {
-            playSound();
-        }
-        return myPBO
+        loadSound();
+        return pBOMusic
             ? () => {
-                unloadSound
+                pBOMusic.unloadAsync();
             }
             : undefined;
 
-    }, [beginNum])
+    }, [])
 
     const [bail, setBail] = useState(0);
     useEffect(() => {
-        if (bail > 0) {
-            //unloadSound();
-            //loadSound(chicken);
-        }
-        return myPBO
+        loadSound();
+        return pBOChicken
             ? () => {
-                unloadSound
+                pBOChicken.unloadAsync();
             }
             : undefined;
-    }, [ bail ])
+    }, [  ])
 
     {/* Render once */ }
     useEffect(() => {
@@ -370,7 +374,7 @@ const MainGame = ({ name, difficulty }) => {
                 { playedMusic?
                 <Pressable
                     style={styles.toggleMusic}
-                    onPress={stopSound}
+                        onPress={{}}
                 >
                         <Text style={styles.toggleText}>
                             Stop ♬
@@ -379,7 +383,7 @@ const MainGame = ({ name, difficulty }) => {
                 :
                     <Pressable
                         style={styles.toggleMusic}
-                        onPress={playSound}
+                        onPress={{}}
                     >
                         <Text style={styles.toggleText}>
                             Play ♬
