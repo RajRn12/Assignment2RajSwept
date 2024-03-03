@@ -38,9 +38,11 @@ const styles = StyleSheet.create({
 
     grid: {
         marginTop: 13,
+        width: '100%',
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
+        alignItems:'center'
     },
 
     clockImage: {
@@ -126,8 +128,7 @@ const styles = StyleSheet.create({
     },
     linkView: {
         marginTop: 15,
-        marginLeft: 204,
-        marginRight: 302
+        alignItems:'center'
     },
 
     inputView: {
@@ -203,9 +204,12 @@ const styles = StyleSheet.create({
         color: "black"
     },
 
+    center: {
+        alignItems:'center'
+    },
+
     playCurrentBtn: {
         marginTop:5,
-        marginLeft: 105,
         backgroundColor: 'lightgreen',
         borderBlockColor: 'black',
         borderStyle: 'solid',
@@ -218,7 +222,6 @@ const styles = StyleSheet.create({
 
     playNewBtn: {
         marginTop: 5,
-        marginLeft: 105,
         backgroundColor: 'yellow',
         borderBlockColor: 'black',
         borderStyle: 'solid',
@@ -229,9 +232,8 @@ const styles = StyleSheet.create({
         borderRadius: 7,
     },
 
-    restartGameBtn: {
-        marginTop: 5,
-        marginLeft: 105,
+    resetGameBtn: {
+        marginTop: 10,
         backgroundColor: 'red',
         borderBlockColor: 'black',
         borderStyle: 'solid',
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     gameBtnView: {
-        marginTop: 25,
+        marginTop: 8,
         alignItems:'center',
         justifyContent: 'center',
     },
