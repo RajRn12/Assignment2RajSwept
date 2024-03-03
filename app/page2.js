@@ -32,7 +32,7 @@ export default function Page2() {
 
 }
 
-{/* Main Game */}
+// Main Game 
 const MainGame = ({ name, difficulty }) => {
     const [tiles, setTiles] = useState([
         { image: tile, selected: false, mine: false },
@@ -88,69 +88,7 @@ const MainGame = ({ name, difficulty }) => {
 
     const [playedMusic, setPlayedMusic] = useState(false);
 
-    {/* Audio File */ }
-    const [pBOMusic, setPBOMusic] = useState(null);
-    const [pBOChicken, setPBOChicken] = useState(null);
-
-    const kalimba = require('../assets/sfx/kalimba.mp3');
-    const chicken = require('../assets/sfx/chicken.mp3');
-    // load a sound
-    const loadSound = async () => {
-        const { kalim } = await Audio.Sound.createAsync(require('../assets/sfx/kalimba.mp3'));
-        const { chick } = await Audio.Sound.createAsync(require('../assets/sfx/chicken.mp3'));     
-        setPBOMusic(kalim);
-        setPBOChicken(chick);
-    }
-    // play a sound
-    const playSound = async () => {
-        try {
-            if (beginNum && bailout != true) {
-                await pBOMusic.playAsync();
-            } else {
-                stopSound();
-            }
-            setPlayedMusic(true);
-        } catch (e) {
-            console.log(e)
-        };
-    }
-
-    // stop a sound
-    const stopSound = async () => {
-        if (bailout == true) {
-            await pBOMusic.stopAsync();
-            await pBOChicken.playAsync();
-        }
-        setPlayedMusic(false);
-    }
-
-    //// unload a sound
-    //const unloadSound = async () => {
-    //    await myPBO.unloadAsync();
-    //}
-
-    const [beginNum, setBeginNum] = useState(0);
-    useEffect(() => {
-        loadSound();
-        return pBOMusic
-            ? () => {
-                pBOMusic.unloadAsync();
-            }
-            : undefined;
-
-    }, [])
-
-    const [bail, setBail] = useState(0);
-    useEffect(() => {
-        loadSound();
-        return pBOChicken
-            ? () => {
-                pBOChicken.unloadAsync();
-            }
-            : undefined;
-    }, [  ])
-
-    {/* Render once */ }
+    // Render once
     useEffect(() => {
         // Difficulty
         if (difficulty == 'MORE TILES') {
@@ -181,8 +119,69 @@ const MainGame = ({ name, difficulty }) => {
         }
     }, [])
 
-    {/* Timer */ }
-    {/* Set Player Name as Unkown if name's not entered */ }
+    // Audio File
+    const [myPBO, setMyPBO] = useState(null);
+    const kalimba = require('../assets/sfx/kalimba.mp3');
+    const chicken = require('../assets/sfx/chicken.mp3');
+
+    // load a sound
+    const loadSound = async (uri) => {
+        const { sound } = await Audio.Sound.createAsync(uri);
+        setMyPBO(sound);
+    }
+    // play a sound
+    const playSound = async () => {
+        try {
+            await myPBO.playAsync();
+            setPlayedMusic(true);
+        } catch (e) {
+            console.log(e)
+        };
+    }
+
+    // stop a sound
+    const stopSound = async () => {
+        await myPBO.stopAsync();
+        setPlayedMusic(false);
+    }
+    // unload a sound
+    const unloadSound = async () => {
+        await myPBO.unloadAsync();
+    }
+
+    // starting music
+    const [beginNum, setBeginNum] = useState(0);
+    useEffect(() => {
+        if (beginNum == 0) {
+            loadSound(kalimba);
+        }
+        if (stop != true && beginNum == 1) {
+            playSound();
+        }
+        return myPBO
+            ? () => {
+                unloadSound
+            }
+            : undefined;
+
+    }, [beginNum])
+
+    // Chicken Noise
+    const [bail, setBail] = useState(0);
+    useEffect(() => {
+        if (bail > 0) {
+            //unloadSound();
+            //loadSound(chicken);
+        }
+        return myPBO
+            ? () => {
+                unloadSound
+            }
+            : undefined;
+    }, [bail])
+
+    // Timer
+    // Set Player Name as Unkown if name's not entered
     const [p_Name, setP_Name] = useState([{ name: '' }]);
     const [currentP, setCurrentP] = useState('');
     const [count, setCount] = useState(null);
@@ -203,23 +202,15 @@ const MainGame = ({ name, difficulty }) => {
         clearInterval(timer.current);
     };
 
-    { /* check Win */ }
-    { /* Time stops a second later so the substraction is needed */ }
-    const [win, setWin] = useState(false);
-    const isWin = () => {
-        if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
-            setPlayerTitle('Winner🏆');
-            setStop(true);
-            stopTimer();
-            Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
-            setWin(true);
-            setDisableBailout(true);
-            setCount(c => c - 1);
-        }
+
+    // Instruction and some info
+    const showGuide = () => {
+        Alert.alert("Instruction/Info",
+            "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can stop music or play music.")
     }
 
-    {/* Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect */ }
-    {/* Record # of good tiles for determining the win */ }
+    // Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect
+    // Record # of good tiles for determining the win
     const [hasBegun, setHasBegun] = useState(false);
     const begin = () => {
         setBeginNum(beginNum => beginNum + 1);
@@ -238,15 +229,15 @@ const MainGame = ({ name, difficulty }) => {
         setCount(0);
     }
 
-    {/* Shuffle mine - Different # of mines depending on game difficulty*/ }
+    // Shuffle mine - Different # of mines depending on game difficulty
     const [random, setRandom] = useState(null);
     const shuffleMine = () => {
         let x = 0;
         if (moreTiles == true) {
-             x = Math.floor(Math.random() * 30);
+            x = Math.floor(Math.random() * 30);
         }
         else {
-             x = Math.floor(Math.random() * 25);
+            x = Math.floor(Math.random() * 25);
         }
         if (random != x) {
             setRandom(x);
@@ -256,7 +247,14 @@ const MainGame = ({ name, difficulty }) => {
         }
     }
 
-    {/* Record # of good tiles and substract it if one of 'em is the mine */ }
+    // User cannot select the same tile again or cannot select any tile unless game has begun, or stop not true
+    const disableSelected = (pos) => {
+        if (hasBegun == false || tiles[pos].selected == true || stop == true) {
+            return true;
+        }
+    }
+
+    // Record # of good tiles and substract it if one of 'em is the mine
     const [num_GoodTile, setNum_GoodTile] = useState(0);
     const checkGoodTile = () => {
         if (moreMines != true) {
@@ -272,15 +270,16 @@ const MainGame = ({ name, difficulty }) => {
         }
     }
 
-    {/* User cannot select the same tile again or cannot select any tile unless game has begun, or stop not true*/ }
-    const disableSelected = (pos) => {
-        if (hasBegun == false || tiles[pos].selected == true || stop == true) {
-            return true;
-        }
+    // Call necessary functions on selected tile
+    const isSelected = (pos) => {
+        let temp = tiles;
+        temp[pos].selected = true;
+        setTiles({ ...temp });
+        givePoints(pos);
     }
 
-    {/* Change selected tile's image to random points tile's image or mine if chosen during shuffle */ }
-    {/* If selected tile is not mine, increase countGood value by 1 for determining the win */}
+    // Change selected tile's image to random points tile's image or mine if chosen during shuffle
+    // If selected tile is not mine, increase countGood value by 1 for determining the win
     const [pointTile, setPointTile] = useState([point100, point200, point400, point500, point800, point1000]);
     const [countGood, setCountGood] = useState(0);
     function givePoints(pos) {     
@@ -309,7 +308,7 @@ const MainGame = ({ name, difficulty }) => {
         }
     }
 
-    {/* Increase Score by number based on points tile's image given to selected tile - alert, reset score and time once mine's found */ }
+    // Increase Score by number based on points tile's image given to selected tile - alert, reset score and time once mine's found
     function addScore(pos) {
         if (tiles[pos].image == point100) {
             setScore(score + 100);
@@ -331,21 +330,22 @@ const MainGame = ({ name, difficulty }) => {
         }
     }
 
-    {/* Call necessary functions on selected tile */ }
-    const isSelected = (pos) => {
-        let temp = tiles;
-        temp[pos].selected = true;
-        setTiles({ ...temp });
-        givePoints(pos);
+    // Check Win
+    // Time stops a second later so the substraction is needed
+    const [win, setWin] = useState(false);
+    const isWin = () => {
+        if (countGood != 0 && countGood == num_GoodTile && mineFound != true) {
+            setPlayerTitle('Winner🏆');
+            setStop(true);
+            stopTimer();
+            Alert.alert("You Won: You beat the Game", "You are the greatest player ever!!!");
+            setWin(true);
+            setDisableBailout(true);
+            setCount(c => c - 1);
+        }
     }
 
-    {/* Instruction and some info */}
-    const showGuide = () => {
-        Alert.alert("Instruction/Info",
-        "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can stop music or play music.")
-    }
-
-    {/* Chicken Bail Out */ }
+    // Chicken Bail Out
     const [bailout, setBailout] = useState(false);
     function bailOut() {
         setBail(1);
@@ -362,7 +362,7 @@ const MainGame = ({ name, difficulty }) => {
 
             {/* Score, timer, guide button */}
             <View style={styles.statView}>
-                <Text style={styles.score}>Score: {score}</Text>
+                <Text style={styles.score}>Score: {score}pts</Text>
                 <Text style={{color: 'purple' }}><Image source={clock} style={styles.clockImage} /> {count}s</Text>
                 <Pressable style={{ width: 20 }} onPress={() => showGuide()}><Image source={guide} style={styles.guide} /></Pressable>
             </View>
@@ -374,7 +374,7 @@ const MainGame = ({ name, difficulty }) => {
                 { playedMusic?
                 <Pressable
                     style={styles.toggleMusic}
-                        onPress={{}}
+                    onPress={stopSound}
                 >
                         <Text style={styles.toggleText}>
                             Stop ♬
@@ -383,7 +383,7 @@ const MainGame = ({ name, difficulty }) => {
                 :
                     <Pressable
                         style={styles.toggleMusic}
-                        onPress={{}}
+                        onPress={playSound}
                     >
                         <Text style={styles.toggleText}>
                             Play ♬
@@ -450,7 +450,7 @@ const MainGame = ({ name, difficulty }) => {
 
                 {/* Show link button to next page once bailout button's been pressed */}
                 {
-                    bailout ?
+                    bailout || win || mineFound ?
                         <View style={styles.linkView}>
                             <Link
                                 href={{
@@ -474,57 +474,6 @@ const MainGame = ({ name, difficulty }) => {
                         : null
                 }
 
-                {/* Show link button to next page once mine's found */}
-                {
-                    mineFound ?
-                        <View style={styles.linkView}>
-                            <Link
-                                href={{
-                                    pathname: "/page3",
-                                    params: {
-                                        g_Difficulty,
-                                        p_Name,
-                                        currentP,
-                                        playerTitle,
-                                        score,
-                                        count
-                                    }
-                                }} asChild
-                            >
-                                {/* takes to second page upon pressing 'Click To Game Page' button */}
-                                <Pressable style={styles.button} onPress={() => stopSound()}>
-                                    <Text style={styles.buttonText}>Result</Text>
-                                </Pressable>
-                            </Link>
-                        </View>
-                        : null
-                }
-           
-                {/* Show link button to next page once players win */}
-                {
-                    win ?
-                        <View style={styles.linkView}>
-                            <Link
-                                href={{
-                                    pathname: "/page3",
-                                    params: {
-                                        g_Difficulty,
-                                        p_Name,
-                                        currentP,
-                                        playerTitle,
-                                        score,
-                                        count
-                                    }
-                                }} asChild
-                            >
-                                {/* takes to second page upon pressing 'Click To Game Page' button */}
-                                <Pressable style={styles.button} onPress={() => stopSound()}>
-                                    <Text style={styles.buttonText}>Result</Text>
-                                </Pressable>
-                            </Link>
-                        </View>
-                        : null
-                }
             </View>
 
         </View>

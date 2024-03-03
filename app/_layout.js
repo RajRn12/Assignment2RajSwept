@@ -28,6 +28,7 @@ export default function Layout() {
 				options={{
 					headerTitle: "The Game",
 					headerShown: true,
+					headerBackVisible: false,
 					headerTitleStyle: {
 						color: "white",
 						fontWeight: "bold"
@@ -42,8 +43,9 @@ export default function Layout() {
 			<Stack.Screen
 				name="page3"
 				options={{
-					headerTitle: "MATCH SUMMARY",
+					headerTitle: "MATCH RESULT",
 					headerShown: true,
+					headerBackVisible: false,
 					headerTitleStyle: {
 						color: "white",
 						fontWeight: "bold"

@@ -1,5 +1,6 @@
 /**
  * File   -  index.js
+ * Credit -  Stepehen Graham
  * Author -  Raj Rai
  */
 import { Pressable, Text, TextInput, View, Button, Alert } from 'react-native';
@@ -10,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 export default function Page1() {
 
     const params = useLocalSearchParams();
-    const { restart } = params;
+    const {  } = params;
 
     const [gameDifficulty, setGameDifficulty] = useState('');
 
@@ -18,6 +19,15 @@ export default function Page1() {
 
     const [proceed, setProceed] = useState(false);
 
+    // reset function
+    function reset() {
+        setProceed(false);
+        setSelected(false);
+        onChangePlayerName("");
+        setGameDifficulty("");
+    }
+
+    // difficulty set
     const isSelected = (difficulty) => {
         if (difficulty != '') {
             setSelected(true);
@@ -26,20 +36,6 @@ export default function Page1() {
     }
 
     const [playerName, onChangePlayerName] = useState("");
-
-    function reset() {
-        if (restart) {
-            setProceed(false);
-            setSelected(false);
-            onChangePlayerName("");
-        }
-    }
-
-    useEffect(() => {
-        if (restart) {
-            reset();
-        }
-    }, [restart])
 
     return (
         <View style={styles.container}>       
@@ -68,7 +64,7 @@ export default function Page1() {
 
                 {/* Select proceed to display this info part */}
                 {proceed ?
-                    <View>
+                    <View style={ styles.center}>
                         <Text style={styles.criticalInfo}>You must select the game difficulty before you can go to the actual game page.</Text>
                         <Text style={styles.criticalInfo}>'Name - 8 characters max'</Text>
                         <Text style={[styles.instruction]}>"Name is not required"</Text>
@@ -122,7 +118,7 @@ export default function Page1() {
                
                 {/* Do not Show the button unless the game difficulty has been selected*/}
                 {
-                    selected ?
+                    selected && proceed?
                         <View style={styles.gameBtnView}>
                              <Link
                                 href={{
@@ -140,7 +136,17 @@ export default function Page1() {
                              </Link>
                          </View>
                         : null
-                        }
+                }
+
+                {
+                    proceed ?
+                        <View style={styles.center}>
+                        <Pressable style={styles.resetGameBtn} onPress={() => reset()}>
+                            <Text style={styles.buttonText}>Reset Game</Text>
+                            </Pressable>
+                    </View>
+                    : null
+                }
             </View>
         </View>
     );

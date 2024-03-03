@@ -16,7 +16,6 @@ export default function Page3() {
     const [pBRLabel, setPBRLabel] = useState('')
 
     const [show, setShow] = useState(false);
-    const [restart, setRestart] = useState(false);
 
     function showIt() {
         if (show == true) {
@@ -32,7 +31,7 @@ export default function Page3() {
             <View style={styles.currentStat}>
                 <Text style={styles.pBR}>⭐Personal Best Record⭐</Text>
                 <Text style={{ }}>Name: {currentSum[0].name} </Text>
-                <Text style={styles.pScore}>Score: {currentSum[0].scores_}</Text>
+                <Text style={styles.pScore}>Score: {currentSum[0].scores_}pts</Text>
                 <Text style={styles.pTime}>Time: {currentSum[0].time}s</Text>
             </View>
 
@@ -44,7 +43,7 @@ export default function Page3() {
             </View>
 
             {show ?
-                <View>
+                <View style={styles.center}>
                 <FlatList
                     keyExtractor={(item) => item.id}
                     data={playerList}
@@ -57,11 +56,11 @@ export default function Page3() {
             }
 
             {show ? null :
-                <View>
+                <View style={styles.center}>
                     <Link
 
                         href={{
-                            pathname: "/page3",
+                            pathname: "/page2",
                             params: {
                                 g_Difficulty,
                                 p_Name,
@@ -81,7 +80,7 @@ export default function Page3() {
             }
 
             {show ? null :
-                <View>
+                <View style={styles.center}>
                     <Link
                         href={{
                             pathname: "/",
@@ -98,25 +97,6 @@ export default function Page3() {
                         {/* takes to second page upon pressing 'Click To Game Page' button */}
                         <Pressable style={styles.playNewBtn}>
                             <Text style={styles.buttonText}>Play As New Player</Text>
-                        </Pressable>
-                    </Link>
-                </View>
-            }
-
-            {show ? null :
-                <View>
-                    <Link
-
-                        href={{
-                            pathname: "/",
-                            params: {
-                                restart
-                            }
-                        }} asChild
-                    >
-                        {/* takes to second page upon pressing 'Click To Game Page' button */}
-                        <Pressable style={styles.restartGameBtn} onPress={() => setRestart(true)}>
-                            <Text style={styles.buttonText}>Restart Game</Text>
                         </Pressable>
                     </Link>
                 </View>
