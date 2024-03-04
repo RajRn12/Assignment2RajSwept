@@ -10,11 +10,36 @@ import styles from '../styles/page-styles';
 export default function Page3() {
 
     const params = useLocalSearchParams();
-    const { g_Difficulty, p_Name, score, count, currentP, playerTitle } = params;
-    const [playerList, setPlayerList] = useState([{ id: 0, name: currentP, scores: score, time: count }])
+    const { g_Difficulty, p_Name, score, count, currentP, playerTitle, oldListPlayer} = params;
     const [currentSum, setCurrentSum] = useState([{ title: playerTitle, name: currentP, scores_: score, time: count }])
     const [pBRLabel, setPBRLabel] = useState('⭐Good Work⭐')
     const [show, setShow] = useState(false);
+
+    const [playerList, setPlayerList] = useState([{ id: 0, name: currentP, scores: 0, time: 0 }])
+    const [oldList, setOldList] = useState(playerList);
+
+    useEffect(() => {
+        createPlayer();
+    }, [])
+
+    function createPlayer() {
+        let id = 0;
+        let temp = [...playerList];
+
+        if (temp[id].name == currentP || temp[id].name == currentP) {
+            temp[id].scores = score;
+            temp[id].time = count;
+            id++
+        }
+        else {
+            temp.push({ id: id, name: currentP, scores: score, time: count });
+            id++;
+        }
+        
+        setPlayerList(temp);
+    }
+
+
 
     function showIt() {
         if (show == true) {
@@ -60,6 +85,7 @@ export default function Page3() {
                         href={{
                             pathname: "/",
                             params: {
+                                oldList
                             }
                         }} asChild
                     >

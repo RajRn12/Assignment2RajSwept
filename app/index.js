@@ -11,7 +11,8 @@ import React, { useEffect, useState } from 'react';
 export default function Page1() {
 
     const params = useLocalSearchParams();
-    const {  } = params;
+    const { oldList } = params;
+    const [oldPlayerList, setOldPlayerList] = useState(oldList);
 
     const [gameDifficulty, setGameDifficulty] = useState('');
 
@@ -126,7 +127,8 @@ export default function Page1() {
                                 pathname: "/page2",
                                 params: {
                                 gameDifficulty,
-                                playerName
+                                playerName,
+                                oldPlayerList
                              }
                             }} asChild
                         >

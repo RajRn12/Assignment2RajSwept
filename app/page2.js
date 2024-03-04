@@ -22,18 +22,18 @@ import mine from '../images/mine.jpg';
 export default function Page2() {
 
     const params = useLocalSearchParams();
-    const {gameDifficulty, playerName, replay} = params;
+    const { gameDifficulty, playerName, oldPlayerList} = params;
 
     return (
         <View style={styles.container}>
-            <MainGame name={playerName} difficulty={gameDifficulty} />
+            <MainGame name={playerName} difficulty={gameDifficulty} oldListPlayer={oldPlayerList} />
         </View>
     );
 
 }
 
 // Main Game 
-const MainGame = ({ name, difficulty }) => {
+const MainGame = ({ name, difficulty, oldListPlayer }) => {
     const [tiles, setTiles] = useState([
         { image: tile, selected: false, mine: false },
         { image: tile, selected: false, mine: false },
@@ -524,13 +524,14 @@ const MainGame = ({ name, difficulty }) => {
                                         currentP,
                                         playerTitle,
                                         score,
-                                        count
+                                        count,
+                                        oldListPlayer
                                     }
                                 }} asChild
                             >
                                 {/* takes to second page upon pressing 'Click To Game Page' button */}
                                 <Pressable style={styles.button} onPress={ () => stopSound()}>
-                                    <Text style={styles.buttonText}>Result</Text>
+                                    <Text style={styles.buttonText}>Save Result</Text>
                                 </Pressable>
                             </Link>
                         </View>
