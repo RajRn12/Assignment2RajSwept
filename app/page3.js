@@ -13,8 +13,7 @@ export default function Page3() {
     const { g_Difficulty, p_Name, score, count, currentP, playerTitle } = params;
     const [playerList, setPlayerList] = useState([{ id: 0, name: currentP, scores: score, time: count }])
     const [currentSum, setCurrentSum] = useState([{ title: playerTitle, name: currentP, scores_: score, time: count }])
-    const [pBRLabel, setPBRLabel] = useState('')
-    const [replay, setReplay] = useState(false);
+    const [pBRLabel, setPBRLabel] = useState('⭐Good Work⭐')
     const [show, setShow] = useState(false);
 
     function showIt() {
@@ -29,7 +28,7 @@ export default function Page3() {
         <View style={styles.container}>
             <Text style={styles.pTitle}>{currentSum[0].title}</Text>
             <View style={styles.currentStat}>
-                <Text style={styles.pBR}>⭐Personal Best Record⭐</Text>
+                <Text style={styles.pBR}>{pBRLabel}</Text>
                 <Text style={{ }}>Name: {currentSum[0].name} </Text>
                 <Text style={styles.pScore}>Score: {currentSum[0].scores_}pts</Text>
                 <Text style={styles.pTime}>Time: {currentSum[0].time}s</Text>

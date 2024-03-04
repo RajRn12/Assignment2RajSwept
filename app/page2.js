@@ -88,10 +88,70 @@ const MainGame = ({ name, difficulty }) => {
 
     const [playedMusic, setPlayedMusic] = useState(false);
 
+    // reset Tiles
+    function resetTiles() {
+        let newTile = {...tiles};
+        newTile[0].image = tile; newTile[0].selected = false; newTile[0].mine = false;
+        newTile[1].image = tile; newTile[1].selected = false; newTile[1].mine = false;
+        newTile[2].image = tile; newTile[2].selected = false; newTile[2].mine = false;
+        newTile[3].image = tile; newTile[3].selected = false; newTile[3].mine = false;
+        newTile[4].image = tile; newTile[4].selected = false; newTile[4].mine = false;
+        newTile[5].image = tile; newTile[5].selected = false; newTile[5].mine = false;
+        newTile[6].image = tile; newTile[6].selected = false; newTile[6].mine = false;
+        newTile[7].image = tile; newTile[7].selected = false; newTile[7].mine = false;
+        newTile[8].image = tile; newTile[8].selected = false; newTile[8].mine = false;
+        newTile[9].image = tile; newTile[9].selected = false; newTile[9].mine = false;
+
+        newTile[10].image = tile; newTile[10].selected = false; newTile[10].mine = false;
+        newTile[11].image = tile; newTile[11].selected = false; newTile[11].mine = false;
+        newTile[12].image = tile; newTile[12].selected = false; newTile[12].mine = false;
+        newTile[13].image = tile; newTile[13].selected = false; newTile[13].mine = false;
+        newTile[14].image = tile; newTile[14].selected = false; newTile[14].mine = false;
+        newTile[15].image = tile; newTile[15].selected = false; newTile[15].mine = false;
+        newTile[16].image = tile; newTile[16].selected = false; newTile[16].mine = false;
+        newTile[17].image = tile; newTile[17].selected = false; newTile[17].mine = false;
+        newTile[18].image = tile; newTile[18].selected = false; newTile[18].mine = false;
+        newTile[19].image = tile; newTile[19].selected = false; newTile[19].mine = false;
+
+        newTile[20].image = tile; newTile[20].selected = false; newTile[20].mine = false;
+        newTile[21].image = tile; newTile[21].selected = false; newTile[21].mine = false;
+        newTile[22].image = tile; newTile[22].selected = false; newTile[22].mine = false;
+        newTile[23].image = tile; newTile[23].selected = false; newTile[23].mine = false;
+        newTile[24].image = tile; newTile[24].selected = false; newTile[24].mine = false;
+        newTile[25].image = tile; newTile[25].selected = false; newTile[25].mine = false;
+        newTile[26].image = tile; newTile[26].selected = false; newTile[26].mine = false;
+        newTile[27].image = tile; newTile[27].selected = false; newTile[27].mine = false;
+        newTile[28].image = tile; newTile[28].selected = false; newTile[28].mine = false;
+        newTile[29].image = tile; newTile[29].selected = false; newTile[29].mine = false;
+
+        setTiles(newTile);
+    }
+
+    // Play Again
+    const [playA, setPlayA] = useState(false);
+    function playAgain() {
+        resetTiles();
+        setPlayA(true);
+
+        stopSound();
+        setCount(null);
+        setScore(0);
+        setCountGood(0);
+        setNum_GoodTile(0);
+        setBeginNum(0);
+
+        setHasBegun(false);
+        setStop(false);
+        setBailout(false);
+        setDisableBailout(false);
+        setWin(false);
+        setmineFound(false);      
+        setRandom(null);
+    }
+
     // Set Player Name as Unkown if name's not entered
-    const [p_Stat, setP_Stat] = useState([{ name: '' }]);
+    // difficulty
     const [currentP, setCurrentP] = useState('');
-    const [playObj, setPlayObj] = useState(null);
     // Render once
     useEffect(() => {
         // Difficulty
@@ -104,43 +164,14 @@ const MainGame = ({ name, difficulty }) => {
             setG_Difficulty('MORE MINES')
         }
 
-        // Player settled
-        let i = 0;
-        while (i < p_Stat.length) {
-            if (p_Stat[i].name == '' && name != '') {
-                setCurrentP(name);
-                setPlayObj({ name: currentP, score: 0, time: 0 });
-                let temp = [...p_Stat];
-                temp.push(playObj);
-                setP_Stat(temp);
+        if (name != '') {
+            setCurrentP(name);
+        }
 
-            }
-            if (name == '') {
-                setCurrentP('Unkown');
-                setPlayObj({ name: currentP, score: 0, time: 0 });
-                let temp = [...p_Stat];
-                temp.push(playObj);
-                setP_Stat(temp);
-            }
-            i++;
+        if (name == '') {
+            setCurrentP('Unkown');
         }
     }, [])
-
-    // Update player current player stats
-    useEffect(() => {
-        let i = 0;
-        while (i < p_Stat.length) {
-            if (p_Stat[i].name == currentP) {
-                let temp = [...p_Stat]
-                temp[i].name = currentP;
-                temp[i].score = score;
-                temp[i].time = count;
-                setP_Stat(temp);
-            }
-            i++;
-        }
-     
-    }, [ score ])
 
     // Audio File
     const [myPBO, setMyPBO] = useState(null);
@@ -207,7 +238,7 @@ const MainGame = ({ name, difficulty }) => {
     const [count, setCount] = useState(null);
     const timer = useRef(null);
     useEffect(() => {
-        if (hasBegun == true && stop != true) {
+        if (hasBegun == true && stop != true && playA == false) {
             timer.current = setInterval(() => {
                 setCount(c => c + 1);
             }, 1000);
@@ -217,6 +248,18 @@ const MainGame = ({ name, difficulty }) => {
             }
         }
     }, [count]);
+
+    useEffect(() => {
+        if (playA == true && hasBegun == true && stop != true) {
+            timer.current = setInterval(() => {
+                setCount(c => c + 1);
+            }, 1000);
+            isWin();
+            return () => {
+                clearInterval(timer.current);
+            }
+        }
+    }, [ playA , count ]);
 
     const stopTimer = () => {
         clearInterval(timer.current);
@@ -375,28 +418,6 @@ const MainGame = ({ name, difficulty }) => {
         setBailout(true);
         setDisableBailout(true);
         Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
-    }
-
-    function resetTiles() {
-        console.log("reset");
-
-    }
-    // Play Again
-    function playAgain() {
-        stopSound();
-        setHasBegun(false);
-        setStop(false);
-        setBailout(false);
-        setDisableBailout(false);
-        setCountGood(0);
-        setWin(false);
-        setmineFound(false);
-        setNum_GoodTile(false);
-        setScore(0);
-        setRandom(null);
-        setNum_GoodTile(0);
-        setBeginNum(0);
-
     }
 
     return (
