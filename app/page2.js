@@ -88,6 +88,10 @@ const MainGame = ({ name, difficulty }) => {
 
     const [playedMusic, setPlayedMusic] = useState(false);
 
+    // Set Player Name as Unkown if name's not entered
+    const [p_Stat, setP_Stat] = useState([{ name: '' }]);
+    const [currentP, setCurrentP] = useState('');
+    const [playObj, setPlayObj] = useState(null);
     // Render once
     useEffect(() => {
         // Difficulty
@@ -100,24 +104,43 @@ const MainGame = ({ name, difficulty }) => {
             setG_Difficulty('MORE MINES')
         }
 
-        // Name - Replay as current - Play as New
+        // Player settled
         let i = 0;
-        while (i < p_Name.length) {
-            if (p_Name[i].name == '' && name != '') {
-                let temp = p_Name;
-                temp[i].name = name;
-                setP_Name(...temp);
+        while (i < p_Stat.length) {
+            if (p_Stat[i].name == '' && name != '') {
                 setCurrentP(name);
+                setPlayObj({ name: currentP, score: 0, time: 0 });
+                let temp = [...p_Stat];
+                temp.push(playObj);
+                setP_Stat(temp);
+
             }
             if (name == '') {
-                let temp = p_Name;
-                temp[i].name = 'Unkown';
-                setP_Name(...temp);
                 setCurrentP('Unkown');
+                setPlayObj({ name: currentP, score: 0, time: 0 });
+                let temp = [...p_Stat];
+                temp.push(playObj);
+                setP_Stat(temp);
             }
             i++;
         }
     }, [])
+
+    // Update player current player stats
+    useEffect(() => {
+        let i = 0;
+        while (i < p_Stat.length) {
+            if (p_Stat[i].name == currentP) {
+                let temp = [...p_Stat]
+                temp[i].name = currentP;
+                temp[i].score = score;
+                temp[i].time = count;
+                setP_Stat(temp);
+            }
+            i++;
+        }
+     
+    }, [ score ])
 
     // Audio File
     const [myPBO, setMyPBO] = useState(null);
@@ -181,9 +204,6 @@ const MainGame = ({ name, difficulty }) => {
     }, [bail])
 
     // Timer
-    // Set Player Name as Unkown if name's not entered
-    const [p_Name, setP_Name] = useState([{ name: '' }]);
-    const [currentP, setCurrentP] = useState('');
     const [count, setCount] = useState(null);
     const timer = useRef(null);
     useEffect(() => {
@@ -206,7 +226,7 @@ const MainGame = ({ name, difficulty }) => {
     // Instruction and some info
     const showGuide = () => {
         Alert.alert("Instruction/Info",
-            "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. Lastly, you can stop music or play music.")
+            "Click any mine-free tile to score random points. You can quit any time to keep your current scores. Be careful, there are mines hidden! Getting a mine means 'GAME OVER!'. You can stop music or play music. Lastly, you can play again as current player")
     }
 
     // Begin the game - shuffle mine(s) once and set count to 1 for starting time with useEffect
@@ -357,6 +377,28 @@ const MainGame = ({ name, difficulty }) => {
         Alert.alert("CHICKEN HAS BEEN FOUND!", "And, it's YOU!")
     }
 
+    function resetTiles() {
+        console.log("reset");
+
+    }
+    // Play Again
+    function playAgain() {
+        stopSound();
+        setHasBegun(false);
+        setStop(false);
+        setBailout(false);
+        setDisableBailout(false);
+        setCountGood(0);
+        setWin(false);
+        setmineFound(false);
+        setNum_GoodTile(false);
+        setScore(0);
+        setRandom(null);
+        setNum_GoodTile(0);
+        setBeginNum(0);
+
+    }
+
     return (
         <View style={styles.container}>
 
@@ -443,7 +485,7 @@ const MainGame = ({ name, difficulty }) => {
                 {
                     hasBegun ?
                         <View style={styles.bailoutView}>
-                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => { bailOut() }} />
+                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => bailOut()} />
                         </View>
                         : null
                 }
@@ -452,13 +494,12 @@ const MainGame = ({ name, difficulty }) => {
                 {
                     bailout || win || mineFound ?
                         <View style={styles.linkView}>
-                            <Button title="Play 🔁" onPress={() => { }} color='blue' />
+                            <Button title="Play 🔁" onPress={() => playAgain()} color='blue' />
                             <Link
                                 href={{
                                     pathname: "/page3",
                                     params: {
                                         g_Difficulty,
-                                        p_Name,
                                         currentP,
                                         playerTitle,
                                         score,
