@@ -49,8 +49,8 @@ export default function Page1() {
                         <Text style={styles.instruction}> You can quit early to keep your scores but you won't be admired :/</Text>
                         <Text style={styles.instruction}>There will be some hidden mines, so be careful!!!</Text>
                         <Text style={styles.instruction}>You must choose all the mine-free tiles to win the game:)</Text>
-                            <Text style={styles.criticalInfo}>You must select the game difficulty before you can go to the actual game page.</Text>
-                            <Text style={styles.criticalInfo}>On the game page, you must hit 'Start The Game' button to start the game.</Text>
+                        <Text style={styles.criticalInfo}>You must select the game difficulty before you can go to the actual game page.</Text>
+                         <Text style={styles.criticalInfo}>On the game page, you must hit 'Start The Game' button to start the game.</Text>
                     </View>
                 }
 
@@ -69,6 +69,7 @@ export default function Page1() {
                         <Text style={styles.criticalInfo}>'Name - 8 characters max'</Text>
                         <Text style={[styles.instruction]}>"Name is not required"</Text>
                         <Text style={[styles.instruction]}>(will be set to 'Unkown')</Text>
+                        <Text style={styles.criticalInfo}>RESET GAME WILL DELETE CURRENT PLAYERS AND THEIR SCORES</Text>
                     </View>
                     : null
                 }

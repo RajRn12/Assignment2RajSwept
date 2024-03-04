@@ -22,7 +22,7 @@ import mine from '../images/mine.jpg';
 export default function Page2() {
 
     const params = useLocalSearchParams();
-    const {gameDifficulty, playerName} = params;
+    const {gameDifficulty, playerName, replay} = params;
 
     return (
         <View style={styles.container}>
@@ -443,7 +443,7 @@ const MainGame = ({ name, difficulty }) => {
                 {
                     hasBegun ?
                         <View style={styles.bailoutView}>
-                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => { bailOut()}} />
+                            <Button disabled={disableBailout ? true : false} title="I Quit" onPress={() => { bailOut() }} />
                         </View>
                         : null
                 }
@@ -452,6 +452,7 @@ const MainGame = ({ name, difficulty }) => {
                 {
                     bailout || win || mineFound ?
                         <View style={styles.linkView}>
+                            <Button title="Play 🔁" onPress={() => { }} color='blue' />
                             <Link
                                 href={{
                                     pathname: "/page3",

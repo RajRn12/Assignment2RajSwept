@@ -14,7 +14,7 @@ export default function Page3() {
     const [playerList, setPlayerList] = useState([{ id: 0, name: currentP, scores: score, time: count }])
     const [currentSum, setCurrentSum] = useState([{ title: playerTitle, name: currentP, scores_: score, time: count }])
     const [pBRLabel, setPBRLabel] = useState('')
-
+    const [replay, setReplay] = useState(false);
     const [show, setShow] = useState(false);
 
     function showIt() {
@@ -58,39 +58,9 @@ export default function Page3() {
             {show ? null :
                 <View style={styles.center}>
                     <Link
-
-                        href={{
-                            pathname: "/page2",
-                            params: {
-                                g_Difficulty,
-                                p_Name,
-                                currentP,
-                                playerTitle,
-                                score,
-                                count
-                            }
-                        }} asChild
-                    >
-                        {/* takes to second page upon pressing 'Click To Game Page' button */}
-                        <Pressable style={styles.playCurrentBtn}>
-                            <Text style={styles.buttonText}>Replay As {currentP}</Text>
-                        </Pressable>
-                    </Link>
-                </View>
-            }
-
-            {show ? null :
-                <View style={styles.center}>
-                    <Link
                         href={{
                             pathname: "/",
                             params: {
-                                g_Difficulty,
-                                p_Name,
-                                currentP,
-                                playerTitle,
-                                score,
-                                count
                             }
                         }} asChild
                     >

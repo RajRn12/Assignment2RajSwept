@@ -45,7 +45,6 @@ export default function Layout() {
 				options={{
 					headerTitle: "MATCH RESULT",
 					headerShown: true,
-					headerBackVisible: false,
 					headerTitleStyle: {
 						color: "white",
 						fontWeight: "bold"

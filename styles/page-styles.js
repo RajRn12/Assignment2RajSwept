@@ -123,12 +123,10 @@ const styles = StyleSheet.create({
     },
     bailoutView: {
         marginTop: 15,
-        justifyContent:"center",
-        alignItems:'center',
     },
     linkView: {
-        marginTop: 15,
-        alignItems:'center'
+        marginLeft: 150,
+        marginRight: 150
     },
 
     inputView: {
@@ -266,8 +264,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 7,
         padding: 2,
-        marginTop: 3,
-        
+        marginTop:10
     },
     buttonText: {
         textAlign:'center',
